@@ -1,0 +1,154 @@
+"acoustic","country",0.5
+"acoustic","rock",0.6
+"alt-country","country",1.0
+"alt-country","alternative",1.0
+"alternative","metal",0.3
+"alternative","rock",0.7
+"alternative metal","metal",0.8
+"alternative rock","rock",1.0
+"ambient","electronic",0.8
+"ambient","classical",0.8
+"ambient","traditional",0.3
+"baroque","classical",1.0
+"black metal","metal",1.0
+"blues","jazz",0.7
+"blues","traditional",0.4
+"blues","rock",0.2
+"blues","folk",0.7
+"blues","rnb",0.5
+"chillout","electronic",1.0
+"chillout","classical",0.2
+"christian hip-hop","hip-hop",0.8
+"christian metal","metal",0.6
+"christian metal","rock",0.6
+"classic metal","heavy metal",0.8
+"classic rock","rock",1.0
+"contemporary classical","classical",1.0
+"crunkcore","rapcore",1.0
+"dance","pop",0.9
+"dance","electronic",0.6
+"dark ambient","ambient",1.0
+"death metal","metal",1.0
+"deathcore","death metal",0.5
+"deathcore","metalcore",0.8
+"disco","pop",1.0
+"disco","funk",0.3
+"disco","dance",1.0
+"doom metal","metal",0.9
+"drum and bass","electronic",1.0
+"dub","ska",1.0
+"dub","chillout",1.0
+"electropop","electronic",1.0
+"electropop","pop",1.0
+"emo","alternative",0.5
+"emo","punk",0.6
+"emo","hardcore",0.5
+"experimental","indie",1.0
+"experimental","traditional",0.2
+"extreme metal","metal",1.0
+"folk","traditional",0.4
+"folk","country",0.8
+"folk metal","metal",1.0
+"folk metal","traditional",0.6
+"folk rock","country",1.0
+"folk rock","rock",1.0
+"freak folk","folk",1.0
+"funk","soul",1.0
+"funk","jazz",0.8
+"gangsta rap","rap",1.0
+"glam metal","metal",0.6
+"glam metal","rock",0.4
+"glam rock","rock",1.0
+"glam rock","heavy metal",0.4
+"gospel","soul",1.0
+"gospel","rnb",0.7
+"grindcore","hardcore",0.4
+"grindcore","metal",0.8
+"groove metal","metal",1.0
+"groove metal","thrash metal",0.5
+"grunge","alternative",1.0
+"grunge","metal",0.1
+"grunge","rock",0.7
+"hard rock","rock",1.0
+"hardcore","metal",0.6
+"hardcore","punk",0.7
+"hardcore","rock",0.4
+"heavy metal","metal",0.9
+"hip hop","hip-hop",1.0
+"hiphop","hip-hop",1.0
+"hip-hop","rap",1.0
+"house","electronic",1.0
+"indie","alternative",1.0
+"indie","rock",0.7
+"indie pop","indie",1.0
+"indie pop","pop",1.0
+"indie rock","indie",1.0
+"industrial","alternative",0.3
+"industrial","electronic",0.5
+"industrial","pop",0.3
+"industrial metal","industrial",1.0
+"industrial metal","metal",0.9
+"jazz","rock",0.4
+"jazz","classical",0.5
+"latin","traditional",0.5
+"latin","pop",0.7
+"melodic death metal","death metal",0.7
+"melodic thrash metal","thrash metal",0.7
+"metalcore","hardcore",0.6
+"metalcore","metal",0.6
+"new wave","post-punk",1.0
+"new wave","disco",0.5
+"nu metal","metal",0.8
+"nu metal","rap",0.2
+"opera","classical",1.0
+"percussion","traditional",1.0
+"pop punk","pop",1.0
+"pop punk","punk",0.8
+"pop rock","pop",1.0
+"pop rock","rock",1.0
+"post grunge","post-grunge",1.0
+"post punk","post-punk",1.0
+"post-grunge","grunge",1.0
+"post-hardcore","hardcore",1.0
+"post-punk","punk",1.0
+"power metal","metal",1.0
+"power pop","pop rock",1.0
+"progressive metal","metal",0.8
+"progressive metal","rock",0.2
+"progressive rock","rock",1.0
+"punk","metal",0.4
+"punk","rock",0.4
+"rap metal","metal",0.6
+"rap metal","rap",0.6
+"rapcore","hardcore",1.0
+"rapcore","rap",1.0
+"reggae","ska",1.0
+"rhythm and bass","rnb",1.0
+"rnb","pop",1.0
+"rock and roll","rock",1.0
+"salsa","traditional",0.6
+"salsa","latin",1.0
+"sludge metal","metal",0.8
+"soul","pop",0.8
+"soul","rnb",0.5
+"speed metal","metal",1.0
+"stoner metal","metal",0.5
+"stoner metal","rock",0.5
+"symphonic metal","classical",0.2
+"symphonic metal","metal",0.8
+"symphony","classical",1.0
+"synthpop","new wave",1.0
+"synthpop","pop",1.0
+"techno","electronic",1.0
+"thrash metal","metal",1.0
+"thrash metal","speed metal",1.0
+"tribal","traditional",1.0
+"trip-hop","hip-hop",0.6
+"trip-hop","house",0.6
+"trip-hop","jazz",0.6
+"viking metal","metal",1.0
+"viking metal","traditional",0.6
+"instrumental","classical",1.0
+"video game music","instrumental",0.9
+"blues rock","blues",1.0
+"blues rock","rock",1.0

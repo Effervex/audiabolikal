@@ -1,0 +1,140 @@
+change-log for last.fm bindings. Please read with each new release.
+===================================================================
+
+6/26:
+- added: MEGA size to ImageSize enum
+- R.I.P. Michael Jackson
+
+6/19:
+- added: Event.getWebsite(), Event.getTicketSuppliers()
+
+6/18:
+- fixed: NPE in Track.search() w/o artist parameter
+
+5/21:
+- fixed: Library.add methods
+
+5/14:
+- changed: some methods in User changed to public
+
+4/23:
+- added: Caller.getLastResult
+
+4/13:
+- changed: User() constructor now private, was public
+- added: Track.getLastFmInfo
+
+4/11:
+- added: Track.getPosition (thanks again Marko Luther)
+
+4/9:
+- changed: implemented Radio 2.0 API
+
+3/27:
+- fixed: User.getInfo
+
+3/20:
+- added: Event.getAttendees
+- added: Artist.getImages
+- added: Image class, ImageHolder.availableSizes()
+- added: User.shout, Artist.shout
+
+3/10:
+- added: ScrobbleCache.clearScrobbleCache
+- fixed: new SubmissionData(String) ArrayIndexOutOfBoundsException
+
+2/28:
+- added: ScrobbleCache
+- added: SubmissionData.toString() SubmissionData(String)
+- added: FileSystemCache now supports caching scrobbles through the ScrobbleCache interface
+
+2/9:
+- added: Radio.skipsLeft
+
+2/5:
+- added: Session.createSession to restore sessions
+- changed: Radio.handshake and Authenticator.getMobileSession now accept 32-character MD5 string as password parameter
+
+1/5:
+- added: DatabaseCache - Cache implementation that stores into any jdbc database
+- added: DomElement.getTagName method
+
+1/1:
+- changed: Cache.createCacheEntryName now returns md5 hashes by default.
+
+12/30:
+- fixed: StringUtilities.cleanUp not replacing * lead to caching error (thanks Andrew Collins)
+
+12/20:
+- Venue promoted to top level class
+- added: Venue.search, Venue.getEvents, Venue.getPastEvents
+- added: Venue.getId
+
+12/11:
+- added: Track.getInfo recognizes duration if available
+- fixed: Track.getInfo for tracks with no album (thanks Robin Fernandes)
+- ant build now includes debug information
+
+12/10:
+- changed: getTopTags methods now return list of Tag (thanks Rudolf Mayer)
+- fixed: FileSystemCache directory is created lazily
+- happy birthday yet another K. ;-)
+
+12/6:
+- changed license to 2-clause BSD
+- fixed: User.getInfo tests if age element is present
+
+12/5:
+- added: User.getRecommendedArtists
+- added: Group.getMembers
+
+12/1:
+- fixed: now playing notification UTF-8 encoding
+
+11/25:
+- fixed: caching may fail due to invalid filename characters, added StringUtilities.cleanUp (thanks Jakob Frank)
+
+11/12
+- added: Basic cache implementation in net.roarsoftware.lastfm.cache and Caller.setCache (thanks Martin Chorley for
+his cache implementation I built upon)
+- added: Rating ability to Scrobbler/SubmissionData (thanks Lukasz Wisniewski)
+
+11/10
+- added: Artist.getEvents (thanks Idan Zohar)
+- added: Artist.share
+- fixed: Event.getStartDate now contains event's start time if available (thanks Idan Zohar)
+
+11/5
+- added: User.getRecommendedEvents
+- added: Library.addArtist, Library.addAlbum, Library.addTrack
+
+10/24
+- added: localised Artist.getInfo method
+- fixed: Playlist.create
+- warning: Artist.getInfo => getWikiLastChanged may return null if locale neither english nor default.
+
+10/18
+- added: Playlist.create
+
+10/6
+- added: Album.search method
+- added: Tag.getWeeklyArtistChart method
+- added: internal Chart.getChart, Chart.getWeeklyChartList, Chart.getWeeklyChartListAsCharts methods
+- changed: refactored all Chart methods to use the new internal Chart.getXXX methods
+
+9/28
+- fixed: Authenticator.getSession() now sends api_sig (thanks Alex Aranda)
+
+9/25
+- fixed: MusicEntry.getPlaycount() (thanks Henrique Pinto)
+
+9/17:
+- changed: ImageSize.EXTRALARGE constant added.
+
+9/8:
+- changed: for consistency reasons order of parameters in Track are now always: artist, track/mbid
+- changed: biography loading and accessor methods now renamed to getWikiXXX() and made available in MusicEntry
+- added: Track.getInfo
+- fixed: StringUtilities.isMbid
+- added: Event.share
+- ps: happy birthday, K. :-)
