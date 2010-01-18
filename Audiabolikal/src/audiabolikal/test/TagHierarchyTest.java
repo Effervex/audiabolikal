@@ -17,6 +17,21 @@ public class TagHierarchyTest extends TestCase {
 		sut_ = TagHierarchy.getInstance();
 	}
 
+	/**
+	 * Checks if a list contains a weighted relation, but evaluated strictly.
+	 * 
+	 * @param wr The wr maybe in the list.
+	 * @param wrList The list of wrs.
+	 * @return True if the relation is in the list, false otherwise.
+	 */
+	private boolean strictlyEqualWeights(WeightedRelation wr,
+			List<WeightedRelation> wrList) {
+		if (!wrList.contains(wr))
+			return false;
+		int index = wrList.indexOf(wr);
+		return wrList.get(index).strictEquals(wr);
+	}
+
 	@Test
 	public void testGetParentTags() {
 		// NOTE: Due to the nature of WeightedRelation equals() method, the
@@ -34,25 +49,21 @@ public class TagHierarchyTest extends TestCase {
 		parents = sut_.getParentTags("thrash metal");
 		assertEquals(2, parents.size());
 		parent = new WeightedRelation("metal", 1f);
-		assertTrue(parents.contains(parent));
+		assertTrue(strictlyEqualWeights(parent, parents));
 		parent = new WeightedRelation("speed metal", 1f);
-		assertTrue(parents.contains(parent));
+		assertTrue(strictlyEqualWeights(parent, parents));
 
 		// Grandparents
-		parents = sut_.getParentTags("melodic death metal");
-		assertEquals(6, parents.size());
-		parent = new WeightedRelation("metal", 0.7f);
-		assertTrue(parents.contains(parent));
-		parent = new WeightedRelation("death metal", 0.7f);
-		assertTrue(parents.contains(parent));
-		parent = new WeightedRelation("metalcore", 0.4f);
-		assertTrue(parents.contains(parent));
-		parent = new WeightedRelation("hardcore", 0.24f);
-		assertTrue(parents.contains(parent));
-		parent = new WeightedRelation("punk", 0.168f);
-		assertTrue(parents.contains(parent));
-		parent = new WeightedRelation("rock", 0.096f);
-		assertTrue(parents.contains(parent));
+		parents = sut_.getParentTags("grindcore");
+		assertEquals(4, parents.size());
+		parent = new WeightedRelation("metal", 0.8f);
+		assertTrue(strictlyEqualWeights(parent, parents));
+		parent = new WeightedRelation("hardcore", 0.4f);
+		assertTrue(strictlyEqualWeights(parent, parents));
+		parent = new WeightedRelation("punk", 0.28f);
+		assertTrue(strictlyEqualWeights(parent, parents));
+		parent = new WeightedRelation("rock", 0.16f);
+		assertTrue(strictlyEqualWeights(parent, parents));
 	}
 
 	@Test

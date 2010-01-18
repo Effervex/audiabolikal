@@ -61,7 +61,7 @@ public class EquipmentGenerator {
 	 * @return Headgear for that tag, or null if tag doesn't exist/has no items.
 	 */
 	public Headgear generateHeadgear(String tag) {
-		return (Headgear) generateItem(tag, Headgear.class.getName());
+		return (Headgear) generateItem(tag, Headgear.class.getSimpleName());
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class EquipmentGenerator {
 	 * @return Face for that tag, or null if tag doesn't exist/has no items.
 	 */
 	public Face generateFace(String tag) {
-		return (Face) generateItem(tag, Face.class.getName());
+		return (Face) generateItem(tag, Face.class.getSimpleName());
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class EquipmentGenerator {
 	 * @return Aura for that tag, or null if tag doesn't exist/has no items.
 	 */
 	public Aura generateAura(String tag) {
-		return (Aura) generateItem(tag, Aura.class.getName());
+		return (Aura) generateItem(tag, Aura.class.getSimpleName());
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class EquipmentGenerator {
 	 * @return Attire for that tag, or null if tag doesn't exist/has no items.
 	 */
 	public Attire generateAttire(String tag) {
-		return (Attire) generateItem(tag, Attire.class.getName());
+		return (Attire) generateItem(tag, Attire.class.getSimpleName());
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class EquipmentGenerator {
 	 * @return Footwear for that tag, or null if tag doesn't exist/has no items.
 	 */
 	public Footwear generateFootwear(String tag) {
-		return (Footwear) generateItem(tag, Footwear.class.getName());
+		return (Footwear) generateItem(tag, Footwear.class.getSimpleName());
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class EquipmentGenerator {
 	 * @return Weapon for that tag, or null if tag doesn't exist/has no items.
 	 */
 	public Weapon generateWeapon(String tag) {
-		return (Weapon) generateItem(tag, Weapon.class.getName());
+		return (Weapon) generateItem(tag, Weapon.class.getSimpleName());
 	}
 
 	/**

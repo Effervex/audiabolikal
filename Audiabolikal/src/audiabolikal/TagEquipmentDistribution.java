@@ -29,8 +29,7 @@ public class TagEquipmentDistribution {
 	}
 
 	/**
-	 * Inserts an item into the distribution, under the correct tag/s and
-	 * item.
+	 * Inserts an item into the distribution, under the correct tag/s and item.
 	 * 
 	 * @param item
 	 *            The item being inserted.
@@ -39,7 +38,6 @@ public class TagEquipmentDistribution {
 		Set<String> associatedGenres = item.getGenres();
 		// For every genre the item is linked to.
 		for (String genre : associatedGenres) {
-			double itemWeight = item.getGenreWeight(genre);
 			Set<String> children = tagHierarchy_.getChildren(genre);
 			// Counting the children, if there are some.
 			int numChildren = 0;
@@ -53,7 +51,9 @@ public class TagEquipmentDistribution {
 
 			// For this genre and any children beneath it
 			for (int i = 0; i < numChildren + 1; i++) {
+				double itemWeight = item.getGenreWeight(genre);
 				String tag = (i == 0) ? genre : childIter.next();
+				// Get/create the equipment distribution
 				Map<String, ProbabilityDistribution<Item>> equipmentDistro = tagEquipmentDistribution_
 						.get(tag);
 				if (equipmentDistro == null) {
@@ -61,19 +61,25 @@ public class TagEquipmentDistribution {
 					tagEquipmentDistribution_.put(tag, equipmentDistro);
 				}
 
-				ProbabilityDistribution<Item> distro = equipmentDistro
-						.get(item.getClass().getSimpleName());
+				// Get/create the particular item distribution
+				ProbabilityDistribution<Item> distro = equipmentDistro.get(item
+						.getClass().getSimpleName());
 				if (distro == null) {
 					distro = new ProbabilityDistribution<Item>();
-					equipmentDistro.put(item.getClass().getSimpleName(), distro);
+					equipmentDistro
+							.put(item.getClass().getSimpleName(), distro);
 				}
 
 				// If for a child, modify the weight based on relationship
 				// to parent.
 				if (i != 0)
-					itemWeight *= tagHierarchy_.getParentWeighting(tag,
-							genre);
-				distro.add(item, itemWeight);
+					itemWeight *= tagHierarchy_.getParentWeighting(tag, genre);
+				
+				// If the item already exists in there, add the weights
+				if (distro.contains(item))
+					distro.set(item, distro.getProb(item) + itemWeight);
+				else
+					distro.add(item, itemWeight);
 			}
 		}
 	}
@@ -118,18 +124,22 @@ public class TagEquipmentDistribution {
 	public void clear() {
 		tagEquipmentDistribution_.clear();
 	}
-	
+
 	/**
 	 * Gets the probability of a particular item being chosen.
 	 * 
-	 * @param tag The tag under which the item lies.
-	 * @param item The item being checked.
+	 * @param tag
+	 *            The tag under which the item lies.
+	 * @param item
+	 *            The item being checked.
 	 * @return The probability of the item being chosen or -1.
 	 */
 	public double getProbability(String tag, Item item) {
-		Map<String, ProbabilityDistribution<Item>> eD = tagEquipmentDistribution_.get(tag);
+		Map<String, ProbabilityDistribution<Item>> eD = tagEquipmentDistribution_
+				.get(tag);
 		if (eD != null) {
-			ProbabilityDistribution<Item> items = eD.get(item.getClass().getSimpleName());
+			ProbabilityDistribution<Item> items = eD.get(item.getClass()
+					.getSimpleName());
 			if (items != null) {
 				return items.getProb(item);
 			}
