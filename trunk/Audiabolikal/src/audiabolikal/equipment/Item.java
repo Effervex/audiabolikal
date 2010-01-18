@@ -19,6 +19,15 @@ import audiabolikal.util.ProbabilityDistribution;
  * @author Samuel J. Sarjant
  */
 public abstract class Item {
+	/** The gaussian range in which items are considered 'ordinary'. */
+	private static final double ORDINARY = 0.1;
+
+	/**
+	 * The maximum SD value. This value results in the best/worst possibility
+	 * being chosen at 1/500.
+	 */
+	private static final double MAX_SD = 2.23;
+
 	/** Each item has at least one colour. A normalised distribution */
 	private ProbabilityDistribution<Color> colourDistribution_;
 
@@ -118,7 +127,9 @@ public abstract class Item {
 	 * defense, and value.
 	 * 
 	 * @param generalItem
-	 *            The general item which spawned this item.
+	 *            The item that spawned this unique item.
+	 * @param name
+	 *            The name of the unique item, based on it's attack and defense.
 	 * @param color
 	 *            The colour of this individual item.
 	 * @param actualValue
@@ -128,13 +139,13 @@ public abstract class Item {
 	 * @param defense
 	 *            The defense of the item.
 	 */
-	private void initialiseIndividualItem(Item generalItem, Color color,
-			int actualValue, float attack, float defense) {
+	private void initialiseIndividualItem(Item generalItem, String name,
+			Color color, int actualValue, float attack, float defense) {
 		individual_ = true;
-		name_ = generalItem.name_;
+		name_ = name;
 		genres_ = generalItem.genres_;
-		attack_ = attack;
-		defense_ = defense;
+		attack_ = Math.max(0, attack);
+		defense_ = Math.max(0, defense);
 		value_ = actualValue;
 	}
 
@@ -147,17 +158,21 @@ public abstract class Item {
 	public Item spawnIndividualItem() {
 		if (!individual_) {
 			// Calculate the fixed values
-			float defense = (float) (baseDefense_ + defenseVariance_
-					* random_.nextGaussian());
-			float attack = (float) (baseAttack_ + attackVariance_
-					* random_.nextGaussian());
+			double defGauss = random_.nextGaussian();
+			float defense = (float) (baseDefense_ + defenseVariance_ * defGauss);
+			double atkGauss = random_.nextGaussian();
+			float attack = (float) (baseAttack_ + attackVariance_ * atkGauss);
 			int calculatedValue = calcItemValue(attack, defense);
 			Color fixedColour = colourDistribution_.sample();
+			String name = generatePrefix(baseAttack_, baseDefense_, atkGauss,
+					defGauss)
+					+ " " + name_;
 
 			try {
 				Item unique = this.getClass().newInstance();
-				unique.initialiseIndividualItem(this, fixedColour,
+				unique.initialiseIndividualItem(this, name, fixedColour,
 						calculatedValue, attack, defense);
+				return unique;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -176,9 +191,56 @@ public abstract class Item {
 	 * @return The value of the item, based on the attack and defense.
 	 */
 	private int calcItemValue(float attack, float defense) {
+		// If attack and defense are 0, just use the value
+		if ((attack + defense) <= 0)
+			return baseValue_;
+		
 		// Simply add and multiply.
 		// TODO Investigate alternative methods. Perhaps exponential?
 		return (int) ((attack + defense) * baseValue_);
+	}
+
+	/**
+	 * Generates a prefix for this item, based on how good/bad it is. The suffix
+	 * chosen is based on the main attribute of the item, determined by whether
+	 * atk or def is higher.
+	 * 
+	 * @param baseAttack
+	 *            The base attack of the item.
+	 * @param baseDefense
+	 *            The base defense of the item.
+	 * @param atkGauss
+	 *            The attack gaussian number.
+	 * @param defGauss
+	 *            The defense gaussian number.
+	 * @return A string prefix corresponding to the dominant attribute gaussian
+	 *         value.
+	 */
+	public static String generatePrefix(float baseAttack, float baseDefense,
+			double atkGauss, double defGauss) {
+		// Attack is dominant
+		double gauss = 0;
+		if (baseAttack >= baseDefense)
+			gauss = atkGauss;
+		else
+			gauss = defGauss;
+
+		// Choosing the prefix set.
+		Object[] prefixes = null;
+		if (gauss > ORDINARY)
+			prefixes = StrongPrefixes.values();
+		else if (gauss < -ORDINARY)
+			prefixes = WeakPrefixes.values();
+		else
+			return "Ordinary";
+
+		// Normalise the value between 0 and 1 and use it as index lookup
+		gauss = Math.abs(gauss);
+		gauss -= ORDINARY;
+		gauss /= MAX_SD;
+		gauss = (gauss > 1) ? 1 : gauss;
+		int index = (int) Math.floor((prefixes.length - 1) * gauss);
+		return prefixes[index].toString();
 	}
 
 	/**
@@ -206,6 +268,24 @@ public abstract class Item {
 	}
 
 	/**
+	 * Gets the attack.
+	 * 
+	 * @return The attack.
+	 */
+	public float getAttack() {
+		return attack_;
+	}
+
+	/**
+	 * Gets the defense.
+	 * 
+	 * @return The defense.
+	 */
+	public float getDefense() {
+		return defense_;
+	}
+
+	/**
 	 * Gets the value of this item.
 	 * 
 	 * @return The value of the item.
@@ -213,16 +293,16 @@ public abstract class Item {
 	public int getValue() {
 		return value_;
 	}
-	
+
 	/**
 	 * Gets the name of the item.
-	 *  
+	 * 
 	 * @return The item name.
 	 */
 	public String getName() {
 		return name_;
 	}
-	
+
 	@Override
 	public String toString() {
 		// Simple name for now.

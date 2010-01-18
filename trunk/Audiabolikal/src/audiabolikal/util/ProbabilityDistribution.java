@@ -29,11 +29,12 @@ public class ProbabilityDistribution<T> implements Collection<T> {
 		random_ = new Random();
 		itemProbs_ = new ArrayList<ItemProb>();
 	}
-	
+
 	/**
 	 * A constructor for the probability distribution.
 	 * 
-	 * @param seed A seed for the random number generator.
+	 * @param seed
+	 *            A seed for the random number generator.
 	 */
 	public ProbabilityDistribution(int seed) {
 		random_ = new Random(seed);
@@ -114,7 +115,8 @@ public class ProbabilityDistribution<T> implements Collection<T> {
 	/**
 	 * Gets the probability of an element, if it exists.
 	 * 
-	 * @param element The element to search for.
+	 * @param element
+	 *            The element to search for.
 	 * @return The probability of the element, or -1.
 	 */
 	public double getProb(T element) {
@@ -149,6 +151,14 @@ public class ProbabilityDistribution<T> implements Collection<T> {
 	 */
 	public boolean set(int index, double newProb) {
 		itemProbs_.get(index).setProbability(newProb);
+		return true;
+	}
+
+	public boolean set(T element, double newProb) {
+		int index = indexOf(element);
+		if (index == -1)
+			return false;
+		set(index, newProb);
 		return true;
 	}
 
@@ -507,6 +517,13 @@ public class ProbabilityDistribution<T> implements Collection<T> {
 
 	// @Override
 	public boolean contains(Object arg0) {
+		int i = 0;
+		Iterator<ItemProb> iter = itemProbs_.iterator();
+		while (iter.hasNext()) {
+			if (iter.next().element_.equals(arg0))
+				return true;
+			i++;
+		}
 		return false;
 	}
 

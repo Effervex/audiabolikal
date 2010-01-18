@@ -12,8 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import audiabolikal.EquipmentGenerator;
-import audiabolikal.equipment.Headgear;
-import audiabolikal.equipment.Item;
+import audiabolikal.equipment.*;
 import audiabolikal.util.ProbabilityDistribution;
 
 public class EquipmentGeneratorTest {
@@ -26,10 +25,31 @@ public class EquipmentGeneratorTest {
 		genres.put("rock", 0.5);
 		ProbabilityDistribution<Color> itemColors = new ProbabilityDistribution<Color>();
 		itemColors.add(Color.GRAY, 1);
+		Collection<Item> items = new HashSet<Item>();
+		
 		Item helm = new Headgear();
 		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
-		Collection<Item> items = new HashSet<Item>();
 		items.add(helm);
+		
+		Item face = new Face();
+		face.initialiseMouldItem("angry", genres, itemColors, 5000, 0, 0, 0, 0);
+		items.add(face);
+		
+		Item aura = new Aura();
+		aura.initialiseMouldItem("ki", genres, itemColors, 100000, 0, 0, 20, 0);
+		items.add(aura);
+		
+		Item attire = new Attire();
+		attire.initialiseMouldItem("suit", genres, itemColors, 50, 0, 0, 80, 15);
+		items.add(attire);
+		
+		Item footwear = new Footwear();
+		footwear.initialiseMouldItem("sandals", genres, itemColors, 10, 0, 0, 10, 2);
+		items.add(footwear);
+		
+		Item weapon = new TwoHanded();
+		weapon.initialiseMouldItem("axe", genres, itemColors, 50, 40, 15, 0, 0);
+		items.add(weapon);
 		sut_ = EquipmentGenerator.initInstance(items);
 	}
 
@@ -46,12 +66,24 @@ public class EquipmentGeneratorTest {
 
 	@Test
 	public void testGenerateFace() {
-		fail("Not yet implemented");
+		// Basic test
+		Face face = sut_.generateFace("metal");
+		assertNotNull(face);
+		assertEquals(face.getName(), "angry");
+		face = sut_.generateFace("thrash metal");
+		assertNotNull(face);
+		assertEquals(face.getName(), "angry");
 	}
 
 	@Test
 	public void testGenerateAura() {
-		fail("Not yet implemented");
+		// Basic test
+		Face face = sut_.generateFace("metal");
+		assertNotNull(face);
+		assertEquals(face.getName(), "angry");
+		face = sut_.generateFace("thrash metal");
+		assertNotNull(face);
+		assertEquals(face.getName(), "angry");
 	}
 
 	@Test

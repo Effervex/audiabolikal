@@ -9,15 +9,17 @@ package audiabolikal;
 public class WeightedRelation {
 	/** The relation name. */
 	private String relation_;
-	
+
 	/** The weight. */
 	private double weight_;
-	
+
 	/**
 	 * A constructor.
 	 * 
-	 * @param tag The parent tag.
-	 * @param weight The weight of the relation.
+	 * @param tag
+	 *            The parent tag.
+	 * @param weight
+	 *            The weight of the relation.
 	 */
 	public WeightedRelation(String tag, double weight) {
 		relation_ = tag;
@@ -53,6 +55,23 @@ public class WeightedRelation {
 		return true;
 	}
 
+	/**
+	 * Compares if two weighted relations have the same weights, rather than
+	 * just the same relations.
+	 * 
+	 * @param wr
+	 *            The comparable relation.
+	 * @return True if the weighted relations are the same in all values.
+	 */
+	public boolean strictEquals(WeightedRelation wr) {
+		if (!equals(wr))
+			return false;
+		double epsilon = 0.01;
+		if ((wr.weight_ > weight_ - epsilon) && (wr.weight_ < weight_ + epsilon))
+			return true;
+		return false;
+	}
+
 	public String getRelation() {
 		return relation_;
 	}
@@ -68,7 +87,7 @@ public class WeightedRelation {
 	public void setWeight(double weight) {
 		this.weight_ = weight;
 	}
-	
+
 	@Override
 	public String toString() {
 		return relation_ + ":" + weight_;
