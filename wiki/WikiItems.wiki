@@ -1,0 +1,62 @@
+#summary The details and implementation of the items in the game.
+= Introduction =
+
+The items of the game make up the soldiers, otherwise they would be nothing. This page (and sub-pages) detail how the items are made, and what attributes they have. Items can be defined by 3 things: a csv file, a mesh file and a texture file. The csv file contains entries for each item, and the mesh and texture files cover the item appearances. The csv file is here: WikiItemDefs.
+
+= Item Types and Generation =
+
+A soldier is made up of several items:
+ * Headgear. This can include helmets, hair, heavy beards, basically anything that goes on a person's head. Headgear behaves like a typical item, with DEF (and maybe ATK) with variable condition.
+ * Face. Though it's not strictly an item, it can be treated and generated like other items. A face will probably not have ATK, DEF or condition, though it can have a single value for purchasing 'plastic-surgery' for your soldiers. Generally, all faces will share the same mesh, but will have multiple textures. A face can also determine the base skin colour for a soldier.
+ * Aura. Much like a face, an aura doesn't have condition, though it may have small effects on ATK or DEF, based on colour. Essentially an aura is just the colour of magic attacks, though auras may have different patterns (_ala_ Tekken 6). Like a face, auras have a single value, though these will be quite steep and perhaps have pre-requisites.
+ * Attire. Attire is the main appearance of a soldier, as it covers the majority of the body. Attire is simply the torso, arms, and pants of a soldier, though this could perhaps be split up into segments, depending on how the project is. Attire can be a multitude of things, basically whatever is wearable. Suits, Armour, Gowns, Physical mutations... As with headgear, attire has variable ATK, DEF and condition.
+ * Footwear. The footwear could possibly be combined with attire, but for now it remains separate.
+ * Weapon/s. Weapons determine the stance and behaviour of a soldier. See subsection for details.
+
+
+
+
+== Weapon ==
+
+A weapon/s can be of four separate types: One-handed, Two-handed (this may have to be split up for hand placement), Dual-wielded, or Sword and shield. The weapon type determines the animations of the soldier, and how the attacks look.
+
+The inspiration for how a weapon looks comes from Disgaea, where the character stance changes (I think) with different weapon types.
+
+When a weapon is designed, its mesh is designed to stick to a specific guideline of where the hands are placed. Generally, a one-handed weapon is handled in the same manner, held in the right at the base in a vertical-ish manner.
+
+As noted above two-handed may be more tricky, as the difference between holding a bastard sword/baseball bat and a bo staff/polearm is significant.
+
+Dual-wielding is essentially just holding two one-handed weapons, though it may not necessarily be two weapons. For instance, chain blades could be dual-wielded.
+
+Sword and shield is merely the name of the stance. It could be lollipop and tyre. But the stance remains the same. Typically these weapons will have a higher DEF (usually at the cost of some other attribute).
+
+
+= General Item =
+
+An item is defined by a general definition (or mould) of item, be it headgear, weapon, etc. This definition defines several things:
+ * The base name for the item (i.e. axe).
+ * The genres the item relates to and how much it relates to them.
+ * The colours an item can take on. Note that an item can be of multiple colours, though an individual item will remain a single colour.
+ * The general value of an item. Note this isn't the value of a normal item of that type, it relates to the attributes of an item. So an item with ATK:10 and DEF:10 with VALUE:10 will have {{{(10 + 10) * 10 = 200}}} value in a simple multiplication value calculation (this is subject to change).
+ * The base attack and defense with variance values. This means that an item will have ATK and DEF equal to these base values +- the variance in a normal distribution. Assuming that a normal distribution has maximum 2.3 SDs, this will result in an item at it's worst 2.3 variances from the base value. For example, an _Axe_ (typically varianced) with BaseATK:40 and VarATK:15 could generate an _Axe_ with ATK:10 (-2 SDs from base) or perhaps ATK:70.
+ * The mesh and texture of the item. This can also be split into male and female parts too.
+
+
+
+= Individual Item =
+
+Much of this information only applies to the general item, so when an individual item is generated, its values are set to concrete values, based on the mould.
+
+== Item Condition and Prefixes ==
+
+As in the example with the _Axe_, the ATK value is set when an individual item is generated. To reflect these set values and give the user an instant idea of what an item's worth is like, the item's name is given a prefix (*and perhaps a suffix later: _Flimsy Axe of Evil_*) which gives an idea of the item's condition. So an _Axe_ of base values is simply called _Ordinary Axe_, whereas a good _Axe_ may be called _Enduring Axe_, and a bad _Axe_: _Flimsy Axe_.
+
+Because items have an initial condition, an optional gameplay feature is to include item durability such that the items degrade with use, requiring the player to repair/replace.
+
+Though colour is determined by the mould, the saturation of the colour can be effected by the item condition. An item of good or average durability will have the regular colour, but items in worse condition will have a progressively more faded appearance, signifying usage. Of course, this doesn't work for white items, but it may be a handy effect.
+
+== Suffixes ==
+
+Suffixes could also relate to tags, perhaps the genre tag that generated the item, perhaps something else. In order to set this up, the `TagHierarchy` could be extended to include words that relate to genres ('metal': "of Brutality", 'pop': "of Pogo Sticking?").
+
+Another possibility is to use artist names in the items, which become stronger when given to the artist in question. These artist names need to come from somewhere, preferably an exterior source of the user so they don't only get artists that they've used. Maybe Last.fm could be used?
