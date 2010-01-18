@@ -1,0 +1,5 @@
+#summary The csv file of the items.
+
+= Introduction =
+
+Here is the item definition page. Of course, the meshes aren't available here, but the file defines all else.
