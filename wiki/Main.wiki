@@ -1,0 +1,21 @@
+#summary The main page from which other pages diverge from.
+
+= Introduction =
+The main page for Audiabolikal, a game in development by Sam Sarjant. From this page, my notes are stored for how the game is shaped and what has been completed.
+
+
+= Links =
+
+== Game Dynamics ==
+WikiGameplay
+
+WikiSoldier
+
+WikiItems
+
+WikiAttacks
+
+WikiStoryline
+
+== Graphics ==
+WikiRepresentation
