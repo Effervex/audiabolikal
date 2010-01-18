@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<project name="last.fm api bindings" default="create-snapshot">
+
+    <property name="src" value="src"/>
+    <property name="bin" value="bin/production/last.fm"/>
+    <property name="doc" value="doc"/>
+
+    <target name="init">
+    	<mkdir dir="${bin}"/>
+    	<mkdir dir="${doc}"/>
+        <tstamp>
+            <format property="date" pattern="M.d"/>
+        </tstamp>
+    </target>
+
+    <target name="compile">
+        <delete includeemptydirs="true">
+            <fileset dir="${bin}" includes="**/*"/>
+        </delete>
+        <javac srcdir="${src}" destdir="${bin}" debug="on" debuglevel="lines,vars,source"/>
+    </target>
+
+    <target name="jar" depends="init">
+        <jar destfile="last.fm-bindings.jar" basedir="${bin}" excludes="test/**/*"/>
+    </target>
+
+    <target name="javadoc">
+        <delete includeemptydirs="true">
+            <fileset dir="${doc}" includes="**/*"/>
+        </delete>
+        <javadoc sourcepath="${src}" destdir="${doc}" link="http://java.sun.com/j2se/1.5.0/docs/api/"
+                 excludepackagenames="examples, test"/>
+    </target>
+
+    <target name="create-snapshot" depends="init, compile, jar, javadoc">
+        <zip file="last.fm-bindings-${date}.zip">
+            <fileset dir="." includes="${src}/**/*" excludes="${src}/test/*"/>
+            <fileset dir="." includes="${doc}/**/*"/>
+            <fileset dir="." includes="build.xml, changes.txt, howto.txt, license.txt, todo.txt"/>
+            <fileset dir="." includes="last.fm-bindings.jar"/>
+        </zip>
+    </target>
+
+</project>

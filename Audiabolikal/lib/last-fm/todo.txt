@@ -1,0 +1,8 @@
+to-do:
+==============
+complete javadoc...
+
+Library.* methods all pass 0 as default limit, as 50 is not accepted by the server.
+Change code if this behavior changes on the server.
+
+optimize: pass the right initial size to all ArrayList constructors (or use LinkedLists?)
