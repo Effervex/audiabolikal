@@ -2,4 +2,7 @@
 
 = Introduction =
 
-Here is the item definition page. Of course, the meshes aren't available here, but the file defines all else.
+Here is the item definition page. Of course, the meshes aren't available here, but the file defines all else. Be sure to follow capitalisation and spelling guidelines.
+
+*"Item Name","genre,genre,...","[RED,60],[WHITE,20],[(0,128,25), 10],...",<Value Mod>,<Base Attack>,<Attack Variance>,<Base Defense>,<Defense Variance>,"<mesh file>","<texture file>"
+----
