@@ -60,3 +60,9 @@ Though colour is determined by the mould, the saturation of the colour can be ef
 Suffixes could also relate to tags, perhaps the genre tag that generated the item, perhaps something else. In order to set this up, the `TagHierarchy` could be extended to include words that relate to genres ('metal': "of Brutality", 'pop': "of Pogo Sticking?").
 
 Another possibility is to use artist names in the items, which become stronger when given to the artist in question. These artist names need to come from somewhere, preferably an exterior source of the user so they don't only get artists that they've used. Maybe Last.fm could be used?
+
+
+
+= Item Genre =
+
+As stated earlier, items have genres tied to them. This dynamic basically defines how soldiers are created. For instance, _Axe_ could have 'metal':1.0, 'rap':0.5, 'traditional':1.0. Of course, an item need not be so general. _Mohawk_ could have 'metal':0.2 and 'punk':1.0. The integration of items into their appropriate genres and sub-genres is handled in the initialisation phase, so when it comes time to generate an item of a particular genre, the representative items will be present.
