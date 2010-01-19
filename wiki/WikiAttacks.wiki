@@ -6,11 +6,11 @@ The types of attacks the soldiers will be using will be great and many. Sure you
 
 
 = Representation =
-An attack is represented by a song title by that particular artist (Strapping Young Lad uses Decimator). The attack is formed at the point that the file is selected. An attack's details are generated based on ID3 data scanned from the file. The scan could take the form of track number \* V1 + title (character by character \* V#) + album (character by character \* V#). The V values are simply prime constants designed to create a large integer to be used as a seed for a random number generator.
+An attack is represented by a song title by that particular artist (Strapping Young Lad uses Decimator). The attack is formed at the point that the file is selected. An attack's details are generated based on ID3 data scanned from the file. The scan could take the form of track number × V1 + title (character by character × V#) + album (character by character × V#). The V values are simply prime constants designed to create a large integer to be used as a seed for a random number generator.
 
 The random number generator can then be used to generate:
-* Attack type: There are multiple types of attack {downward, forehand, backhand, top-left to bottom-right, top-right to bottom-left, spinning L-R, spinning R-L, thrusting, magical}. Each attack has a different animation and properties.
-* Initial attack properties. An attack can have multiple properties, shown in the Levelling up attacks section. Initially an attack may only have a few properties (maybe 1 or 2).
+ * Attack type: There are multiple types of attack {downward, forehand, backhand, top-left to bottom-right, top-right to bottom-left, spinning L-R, spinning R-L, thrusting, magical}. Each attack has a different animation and properties.
+ * Initial attack properties. An attack can have multiple properties, shown in the Levelling up attacks section. Initially an attack may only have a few properties (maybe 1 or 2).
 
 
 = Attack usage =
@@ -96,13 +96,13 @@ Push back has three levels of pushing back. The maxed push back chance for each 
 == Move after attack ==
 Another strategy is to move after attacking. A restriction to this is that the movement can only go to squares within a height range, and cannot go to an occupied square.
 
-Movement is limited to a number of squares, increasing over the levels. Height range also increase over levels by 0.2 * soldier normal jumping height range.
+Movement is limited to a number of squares, increasing over the levels. Height range also increase over levels by 0.2 × soldier normal jumping height range.
  * Levels 1-4, can only move 1 square
  * Levels 5-7, can move up to 2 squares
  * Levels 8-9, can move up to 3 squares
  * Levels 10, can move up to 4 squares
 
-For example, at action level 9, the soldier can move 3 squares, jumping 1.8 * the soldier's normal jumping height range.
+For example, at action level 9, the soldier can move 3 squares, jumping 1.8 × the soldier's normal jumping height range.
 
 
 == Steal ==
