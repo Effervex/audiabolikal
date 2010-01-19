@@ -1,0 +1,22 @@
+#summary What makes up a soldier and how it behaves.
+= Introduction =
+
+Soldiers are the troops a user controls to do battle. A soldier is basically defined by the items it is made up of, though some aren't really considered items (Face). Soldiers behave like other soldiers, with typical attributes like level, HP and other elements. Soldiers are created by an artist's name, taken from an MP3 file provided by the user.
+
+
+= Soldier creation =
+
+To create a soldier, the user enters the soldier creation menu (perhaps a building in towns or what have you) and selects an MP3 (or other music file) from their computer from which ID3 data is read. The data is then used to lookup information from Last.fm regarding an artist's main tags and also to look up a user's number of plays for that particular artist. The file provided is also the initial attack the soldier has which is explained in WikiAttacks.
+
+The tags received from Last.fm regarding the artist are used to generate the items the soldier is initially made up of. The top three recognised tags are used as a seed for the item generation process (so the popular tag female vocalist (unrecognised) will not affect item generation, though could affect the soldier's gender).
+
+== Item generation ==
+Some of this is covered in WikiItems, but it will be explained here too.
+
+Unfortunately, due to Last.fm's API limitations, the artist's general tags aren't used, the track used to spawn the artist is used for tags. This is because when retrieving artist tags, the tag count is not given, whereas with tracks the tag count is given. However, this is also an upside, as different tracks spawn different permutations of soldier (*something to inform the user of*). Furthermore tracks can be used to identify the artist when there are several artists of the same name.
+
+The top three recognised tag counts for the track are then stored in a distribution, normalised to their proportions. This distribution is then used to sample items using the tags given. So a track which is mainly tagged as _metal_ and a little _pop_ and _rock_ will create a soldier which mainly looks metal. For example, when determining the headgear, the distribution may sample _metal_ which again samples an item from the metal headgear distribution. This item is then instantiated as an individual item (see WikiItems) and equipped to the soldier.
+
+Ideally this method of sampling will generate a soldier which looks like a reasonable personification of the music. This assumes that the tags are well tagged by users of Last.fm, so this method may fail somewhat with obscure artists with few tags.
+
+== Soldier attributes ==
