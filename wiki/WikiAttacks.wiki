@@ -9,12 +9,14 @@ The types of attacks the soldiers will be using will be great and many. Sure you
 An attack is represented by a song title by that particular artist (Strapping Young Lad uses Decimator). The attack is formed at the point that the file is selected. An attack's details are generated based on ID3 data scanned from the file. The scan could take the form of track number * V1 + title (character by character * V#) + album (character by character * V#). The V values are simply prime constants designed to create a large integer to be used as a seed for a random number generator.
 
 The random number generator can then be used to generate:
-* Attack type: There are multiple types of attack {downward, forehand, backhand, top-left to bottom-right, top-right to bottom-left, thrusting, magical}. Each attack has a different animation and properties.
+* Attack type: There are multiple types of attack {downward, forehand, backhand, top-left to bottom-right, top-right to bottom-left, spinning L-R, spinning R-L, thrusting, magical}. Each attack has a different animation and properties.
 * Initial attack properties. An attack can have multiple properties, shown in the Levelling up attacks section. Initially an attack may only have a few properties (maybe 1 or 2).
 
 
 = Attack usage =
 Because these track-attacks all seem to be kinda special, it might be wise to also allow basic attacks which cost nothing, but don't have any effects either. Perhaps, like Disgaea, these attacks could also be combined with others to create combo damage.
+
+Like most tactical RPGs, attacks have a height range, where downhill attacks have an advantage over uphill attacks.
 
 
 == Criticals ==
@@ -25,9 +27,106 @@ When using basic attacks, there is a chance for a critical hit. This chance is s
 = Levelling up attacks =
 The more an attack is used, the more ATK-EXP it receives, allowing the user to increase the capabilities of the attack by increasing properties of the attack. Initially the attack may have a few properties generated from the initialisation, but in a skill fashion, the user can add capabilities to the attack.
 
-Each attack boost has 10 levels:
+Each attack boost has 10 levels. Graphically, the attack animation is scaled with each level:
 
 
 == Greater range ==
-This causes the attack to hit more than one square, though attacks not in the primary direction will not hit at full strength. The range is extended based on the type of attack.
-+10% damage per square. Deeper tree results in more squares.
+This causes the attack to hit more than one square, though attacks not in the primary direction will not hit at full strength. The range is extended based on the type of attack. Each attack type has 5 levels of range, each level containing 2 squares. Initially, a new level starts at 20% damage, but with each successive level, the level below get increased by 20%. So the first 2 squares purchased will only be at 20% damage, but when a third square is purchased, the first 2 are then 40% damage, and the third (and fourth) at 20%. Eventually, after all 10 levels have been purchased, the initial two will be at 100% damage.
+
+Each type of attack also has a fixed range extension. The numbers of the table indicate the levels of range purchases (where squares can only be purchased when all squares of the previous level have been purchased). 0 indicates the original range. X indicates the soldier.
+
+*Downward strike*
+||5||3||5||
+||2||3||2||
+||1||0||1||
+||4||X||4||
+
+*Horizontal (Forehand or backhand)*
+||5||2||1||0||1||2||5||
+|| ||4||3||X||3||4|| ||
+
+*TL-BR & TR-BL*
+||3||5|| || || || || || || || || ||5||3||
+||4||2||2|| || || || || || || ||2||2||4||
+|| ||1||0||4|| || || || || ||4||0||1|| ||
+|| || ||X||1||3|| || || ||3||1||X|| || ||
+|| || || || ||5|| || || ||5|| || || || ||
+
+*Spinning L-R & Spinning R-L*
+|| ||4||0||1|| || || || || ||1||0||4|| ||
+||5||3||X||1||4|| || || ||4||1||X||3||5||
+|| ||3||2||2|| || || || || ||2||2||3|| ||
+|| || ||5|| || || || || || || ||5|| || ||
+
+*Thrusting*
+|| || ||4|| || ||
+|| || ||3|| || ||
+|| || ||2|| || ||
+|| ||4||1||3|| ||
+||5||2||0||1||5||
+|| || ||X|| || ||
+
+*Magical*
+|| || || ||4|| || || ||
+|| || || ||2|| || || ||
+|| || || ||0|| || || ||
+||5||3||1||X||1||3||5||
+|| || || ||2|| || || ||
+|| || || ||4|| || || ||
+
+In total, the final damage output of a maxed out attack range is 700% spread across the squares
+
+
+== Greater damage ==
+A simple attack modifier is to increase the damage the attack does. The maximal damage this can do is 700% attack damage. Because a normal attack is 100%, each level to this skill adds 60% damage.
+
+
+== Greater height ==
+
+
+== Push back ==
+A strategic attack skill is to add push back to the attack. If the attack hits, it has a chance to push the enemy back in a direction from the soldier (so an enemy hit on the side using attack range bonus will be pushed away sideways).
+
+Push back has three levels of pushing back. The maxed push back chance for each is:
+ * 1 square: 100% (10% per level from level 1+)
+ * 2 squares: 50% (10% per level from level 6+)
+ * 3 squares: 20% (10% per level from level 9+)
+
+
+== Move after attack ==
+Another strategy is to move after attacking. A restriction to this is that the movement can only go to squares within a height range, and cannot go to an occupied square.
+
+Movement is limited to a number of squares, increasing over the levels. Height range also increase over levels by 0.2 * soldier normal jumping height range.
+ * Levels 1-4, can only move 1 square
+ * Levels 5-7, can move up to 2 squares
+ * Levels 8-9, can move up to 3 squares
+ * Levels 10, can move up to 4 squares
+
+For example, at action level 9, the soldier can move 3 squares, jumping 1.8 * the soldier's normal jumping height range.
+
+
+== Steal ==
+A simple skill useful for acquiring items (and taking from enemies). Steal has a chance of stealing items from the enemy, with higher levels able to steal faces and auras. Maxed out, the steal percentages are:
+ * Headgear & Footwear: 20% (2% per level from level 1+)
+ * Attire & Weapon: 15% (2.5% per level from level 5+)
+ * Face: 5% (2.5% per level from level 9+)
+ * Aura: 2% (2% per level from level 10+)
+
+
+== Poison ==
+Poison adds the ability to inflict ongoing damage to the enemy struck by it. Poison damage lasts between 3 and 5 turns (determined at the time of striking). The amount of damage inflicted by the poison depends on the strength of skill.
+ * 2% of the poisoner's MaxHP poison damage per turn.
+
+So a soldier with Poison at level 4 (8%) with 500 MaxHP will inflict 40 damage per turn. Minimum total damage: 120 damage, Maximum damage: 200.
+
+
+== Weaken ==
+
+
+== Corrode ==
+
+
+== Blur ==
+
+
+== Slow ==
