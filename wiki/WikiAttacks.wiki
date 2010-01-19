@@ -35,6 +35,9 @@ This causes the attack to hit more than one square, though attacks not in the pr
 
 Each type of attack also has a fixed range extension. The numbers of the table indicate the levels of range purchases (where squares can only be purchased when all squares of the previous level have been purchased). 0 indicates the original range. X indicates the soldier.
 
+*Important*
+Other skills combined with greater range are also affected by the damage percentages. The greater damage is a simple matter of multiplying the modifiers, while the chance based skills (Rebuff, Steal, Poison, Weaken, etc). Greater height and repositioning are unaffected and apply to all squares.
+
 *Downward strike*
 ||5||3||5||
 ||2||3||2||
@@ -82,19 +85,21 @@ A simple attack modifier is to increase the damage the attack does. The maximal 
 
 
 == Greater height ==
+An alternative attack modifier is to enable the ability to hit target at greater heights.
+ * +0.2 height modifier per level of skill.
 
 
-== Push back ==
-A strategic attack skill is to add push back to the attack. If the attack hits, it has a chance to push the enemy back in a direction from the soldier (so an enemy hit on the side using attack range bonus will be pushed away sideways).
+== Rebuff ==
+A strategic attack skill is to add rebuff to the attack. If the attack hits, it has a chance to push the enemy back in a direction from the soldier (so an enemy hit on the side using attack range bonus will be pushed away sideways).
 
-Push back has three levels of pushing back. The maxed push back chance for each is:
+Rebuff has three levels of pushing back. The maxed rebuff chance for each is:
  * 1 square: 100% (10% per level from level 1+)
  * 2 squares: 50% (10% per level from level 6+)
  * 3 squares: 20% (10% per level from level 9+)
 
 
-== Move after attack ==
-Another strategy is to move after attacking. A restriction to this is that the movement can only go to squares within a height range, and cannot go to an occupied square.
+== Reposition ==
+Another strategy is to reposition after attacking. A restriction to this is that the movement can only go to squares within a height range, and cannot go to an occupied square.
 
 Movement is limited to a number of squares, increasing over the levels. Height range also increase over levels by 0.2 × soldier normal jumping height range.
  * Levels 1-4, can only move 1 square
@@ -121,12 +126,20 @@ So a soldier with Poison at level 4 (8%) with 500 MaxHP will inflict 40 damage p
 
 
 == Weaken ==
+Weaken temporarily decreases an enemy's attack for 3-5 turns.
+ * 2% decrease in enemy attack per level for the duration of 3-5 turns.
 
 
 == Corrode ==
+Weaken temporarily decreases an enemy's defense for 3-5 turns.
+ * 2% decrease in enemy defense per level for the duration of 3-5 turns.
 
 
 == Blur ==
+Weaken temporarily decreases an enemy's hit for 3-5 turns.
+ * 2% decrease in enemy hit per level for the duration of 3-5 turns.
 
 
 == Slow ==
+Weaken temporarily decreases an enemy's evasion for 3-5 turns.
+ * 2% decrease in enemy evasion per level for the duration of 3-5 turns.
