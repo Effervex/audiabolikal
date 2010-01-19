@@ -1,0 +1,33 @@
+#summary How the attacks work.
+
+= Introduction =
+
+The types of attacks the soldiers will be using will be great and many. Sure you could just have the standard vertical slash/bonk, but that would grow boring. Currently the weapons of all soldiers are melee weapons, so creating a number of varied attack animations shouldn't be too tricky.
+
+
+= Representation =
+An attack is represented by a song title by that particular artist (Strapping Young Lad uses Decimator). The attack is formed at the point that the file is selected. An attack's details are generated based on ID3 data scanned from the file. The scan could take the form of track number * V1 + title (character by character * V#) + album (character by character * V#). The V values are simply prime constants designed to create a large integer to be used as a seed for a random number generator.
+
+The random number generator can then be used to generate:
+* Attack type: There are multiple types of attack {downward, forehand, backhand, top-left to bottom-right, top-right to bottom-left, thrusting, magical}. Each attack has a different animation and properties.
+* Initial attack properties. An attack can have multiple properties, shown in the Levelling up attacks section. Initially an attack may only have a few properties (maybe 1 or 2).
+
+
+= Attack usage =
+Because these track-attacks all seem to be kinda special, it might be wise to also allow basic attacks which cost nothing, but don't have any effects either. Perhaps, like Disgaea, these attacks could also be combined with others to create combo damage.
+
+
+== Criticals ==
+When using basic attacks, there is a chance for a critical hit. This chance is standard across the board, but it can be increased based on the user's listening habits. If a user listens to a particular artist a lot in the past 7 days, the critical % also rises, making listening to music a smart move.
+
+
+
+= Levelling up attacks =
+The more an attack is used, the more ATK-EXP it receives, allowing the user to increase the capabilities of the attack by increasing properties of the attack. Initially the attack may have a few properties generated from the initialisation, but in a skill fashion, the user can add capabilities to the attack.
+
+Each attack boost has 10 levels:
+
+
+== Greater range ==
+This causes the attack to hit more than one square, though attacks not in the primary direction will not hit at full strength. The range is extended based on the type of attack.
++10% damage per square. Deeper tree results in more squares.
