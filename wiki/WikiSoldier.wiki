@@ -4,7 +4,7 @@
 Soldiers are the troops a user controls to do battle. A soldier is basically defined by the items it is made up of, though some aren't really considered items (Face). Soldiers behave like other soldiers, with typical attributes like level, HP and other elements. Soldiers are created by an artist's name, taken from an MP3 file provided by the user.
 
 
-= Soldier creation =
+= Creation =
 
 To create a soldier, the user enters the soldier creation menu (perhaps a building in towns or what have you) and selects an MP3 (or other music file) from their computer from which ID3 data is read. The data is then used to lookup information from Last.fm regarding an artist's main tags and also to look up a user's number of plays for that particular artist. The file provided is also the initial attack the soldier has which is explained in WikiAttacks.
 
@@ -19,4 +19,20 @@ The top three recognised tag counts for the track are then stored in a distribut
 
 Ideally this method of sampling will generate a soldier which looks like a reasonable personification of the music. This assumes that the tags are well tagged by users of Last.fm, so this method may fail somewhat with obscure artists with few tags.
 
-== Soldier attributes ==
+
+
+== Attributes ==
+Like most tactical RPGs, soldiers have personal attributes. The main attribute is level, determined by experience. Along with level is HP, SP, ATK, DEF, INT, RES, HIT, SPD (copied from Disgaea). As of yet, I'm not sure how these values are determined or grown, but I feel as though they should grow based on what the soldier is equipped with. For example, a soldier equipped with items of high ATK will result in that soldier having a higher overall ATK. Perhaps noting the dominant attribute for each item and growing those attributes at a greater rate than others.
+
+A soldier's initial attributes and growth rate could also be determined via music information. This could be one area where the album comes into play.
+
+
+
+= Attacks =
+A soldiers first attack is set by the initial mp3 file used to generate the soldier itself. The details of the attack are in WikiAttacks. A soldier can have a maximum of 4 attacks, each gathered from music files provided by the user. The attacks are of two different types: physical or magical. Also, the area of the effect for the attacks can come in many variations.
+
+The power of a soldier's attack is based on the weapon used and the soldier's attributes.
+
+
+= Stance =
+The stance, or animation, of a soldier is determined purely by what weapon it has equipped.
