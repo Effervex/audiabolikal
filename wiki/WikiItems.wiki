@@ -3,7 +3,7 @@
 
 = Introduction =
 
-The items of the game make up the soldiers, otherwise they would be nothing. This page (and sub-pages) detail how the items are made, and what attributes they have. Items can be defined by 3 things: a csv file, a mesh file and a texture file. The csv file contains entries for each item, and the mesh and texture files cover the item appearances. The csv file is here: WikiItemDefs.
+The items of the game make up the soldiers (WikiSoldier), otherwise they would be nothing. This page (and sub-pages) detail how the items are made, and what attributes they have. Items can be defined by 3 things: a csv file, a mesh file and a texture file. The csv file contains entries for each item, and the mesh and texture files cover the item appearances. The csv file is here: WikiItemDefs.
 
 = Item Types and Generation =
 
