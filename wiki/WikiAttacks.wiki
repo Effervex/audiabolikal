@@ -23,6 +23,13 @@ Like most tactical RPGs, attacks have a height range, where downhill attacks hav
 When using basic attacks, there is a chance for a critical hit. This chance is standard across the board, but it can be increased based on the user's listening habits. If a user listens to a particular artist a lot in the past 7 days, the critical % also rises, making listening to music a smart move.
 
 
+== Attack graphics ==
+Because the attacks are special, they deserve special effects. Perhaps darkening of the screen, flashes of light, etc.
+
+A possible audio effect could be to temporarily silence the Jukebox and play a ~5 second segment of the song the attack is based on. This will initially be set to an average value (where the average chorus comes in on a song), but the user can elect to reposition the sample location manually. The transition from Jukebox song to attack sample can be done with a fade (though with a 5 second sample, this fade have to be performed quickly).
+
+A problem with this song sampling is that it may be quite memory intensive in that the attack song will have to be loaded into memory before the attack is performed. Because this is a tactical RPG, the loading can be performed while the user is still setting units up before attacking.
+
 
 = Levelling up attacks =
 The more an attack is used, the more ATK-EXP it receives, allowing the user to increase the capabilities of the attack by increasing properties of the attack. Initially the attack may have a few properties generated from the initialisation, but in a skill fashion, the user can add capabilities to the attack.
