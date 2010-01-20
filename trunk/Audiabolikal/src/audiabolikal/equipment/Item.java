@@ -28,6 +28,15 @@ public abstract class Item {
 	 */
 	private static final double MAX_SD = 2.23;
 
+	/** The amount of level variance per SD for a generated item. */
+	private static final int LEVEL_VARIANCE = 2;
+
+	/** The minimum gain per level for each attribute in an item. */
+	private static final float MIN_GAIN_PER_LEVEL = 0.2f;
+
+	/** The coefficient for the base value when levelling. */
+	private static final float BASE_COEFFICIENT = 0.1f;
+
 	/** Each item has at least one colour. A normalised distribution */
 	private ProbabilityDistribution<Color> colourDistribution_;
 
@@ -68,6 +77,9 @@ public abstract class Item {
 	 * or a general mould.
 	 */
 	private boolean individual_;
+
+	/** The level of this item. */
+	private int level_;
 
 	private float attack_;
 	private float defense_;
@@ -114,7 +126,7 @@ public abstract class Item {
 			ProbabilityDistribution<Color> itemColors, int valueMod,
 			float baseAttack, float attackVariance, float baseDefense,
 			float defenseVariance, float baseHit, float hitVariance,
-			float baseEvasion, float evasion) {
+			float baseEvasion, float evasionVariance) {
 		individual_ = false;
 		name_ = name;
 		genres_ = genres;
@@ -124,6 +136,10 @@ public abstract class Item {
 		baseDefense_ = baseDefense;
 		attackVariance_ = attackVariance;
 		defenseVariance_ = defenseVariance;
+		baseHit_ = baseHit;
+		baseEvasion_ = baseEvasion;
+		hitVariance_ = hitVariance;
+		evasionVariance_ = evasionVariance;
 		random_ = new Random();
 	}
 
@@ -135,6 +151,8 @@ public abstract class Item {
 	 *            The item that spawned this unique item.
 	 * @param name
 	 *            The name of the unique item, based on it's attack and defense.
+	 * @param level
+	 *            The level of this item.
 	 * @param color
 	 *            The colour of this individual item.
 	 * @param actualValue
@@ -149,9 +167,10 @@ public abstract class Item {
 	 *            The evasion of the item.
 	 */
 	private void initialiseIndividualItem(Item generalItem, String name,
-			Color color, int actualValue, float attack, float defense,
-			float hit, float evasion) {
+			int level, Color color, int actualValue, float attack,
+			float defense, float hit, float evasion) {
 		individual_ = true;
+		level_ = level;
 		name_ = name;
 		genres_ = generalItem.genres_;
 		attack_ = Math.max(0, attack);
@@ -165,9 +184,14 @@ public abstract class Item {
 	 * Spawns an individual item from the general mould, after calculating
 	 * values.
 	 * 
+	 * @param level
+	 *            TODO
+	 * @param strictLevel
+	 *            TODO
+	 * 
 	 * @return An individual item.
 	 */
-	public Item spawnIndividualItem() {
+	public Item spawnIndividualItem(int level, boolean strictLevel) {
 		if (!individual_) {
 			// Calculate the fixed values
 			double defGauss = random_.nextGaussian();
@@ -175,22 +199,34 @@ public abstract class Item {
 			double atkGauss = random_.nextGaussian();
 			float attack = (float) (baseAttack_ + attackVariance_ * atkGauss);
 			double hitGauss = random_.nextGaussian();
-			float hit = (float) (baseHit_ + hitVariance_ * defGauss);
+			float hit = (float) (baseHit_ + hitVariance_ * hitGauss);
 			double evasionGauss = random_.nextGaussian();
-			float evasion = (float) (baseEvasion_ + evasionVariance_ * atkGauss);
+			float evasion = (float) (baseEvasion_ + evasionVariance_ * evasionGauss);
 			int calculatedValue = calcItemValue(attack, defense, hit, evasion);
 			Color fixedColour = colourDistribution_.sample();
 			String name = generateDescriptor(baseAttack_, baseDefense_,
 					atkGauss, defGauss, StrongPrefixes.values(), WeakPrefixes
-							.values(), "Ordinary")
+							.values(), "Ordinary", ORDINARY)
 					+ " "
 					+ name_
 					+ generateSuffix(baseHit_, baseEvasion_, hitGauss,
 							evasionGauss);
 
+			// Modify the level if not fixed
+			if (!strictLevel) {
+				level += random_.nextGaussian() * LEVEL_VARIANCE;
+				level = Math.max(1, level);
+			}
+
+			// Apply the level to the base stats.
+			attack = applyLevel(level - 1, attack, baseAttack_, attackVariance_);
+			defense = applyLevel(level - 1, defense, baseDefense_, defenseVariance_);
+			hit = applyLevel(level - 1, hit, baseHit_, hitVariance_);
+			evasion = applyLevel(level - 1, evasion, baseEvasion_, evasionVariance_);
+
 			try {
 				Item unique = this.getClass().newInstance();
-				unique.initialiseIndividualItem(this, name, fixedColour,
+				unique.initialiseIndividualItem(this, name, level, fixedColour,
 						calculatedValue, attack, defense, hit, evasion);
 				return unique;
 			} catch (Exception e) {
@@ -198,6 +234,45 @@ public abstract class Item {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Applies levelling to an attribute, calculated using the base attribute
+	 * and attribute variance. An attribute will always receive at least 0.2,
+	 * even if it has 0 base and variance.
+	 * 
+	 * The formula for calculating level gain is as follows: 0.1 * base + 0.2 *
+	 * variance * |gauss|
+	 * 
+	 * @param levelsGained
+	 *            The level of the item.
+	 * @param attribute
+	 *            The initial unlevelled attribute of the item.
+	 * @param baseAttribute
+	 *            The base attribute used to determine the attribute.
+	 * @param attackVariance
+	 *            The base variance used to determine the attribute.
+	 * @return The new value of the attribute, at least 0.2 higher than before.
+	 */
+	public float applyLevel(int levelsGained, float attribute,
+			float baseAttribute, float attributeVariance) {
+		// Ensuring there's some gain
+		if ((baseAttribute + attributeVariance) == 0)
+			attributeVariance = 1;
+
+		// Apply boosting for every level gained
+		float attributeGain = 0;
+		float constantGain = BASE_COEFFICIENT * baseAttribute
+				+ MIN_GAIN_PER_LEVEL * attributeVariance;
+		for (int i = 0; i < levelsGained; i++) {
+			float levelGain = constantGain
+					* (float) Math.abs(random_.nextGaussian());
+			if (levelGain < MIN_GAIN_PER_LEVEL)
+				levelGain = MIN_GAIN_PER_LEVEL;
+			attributeGain += levelGain;
+		}
+
+		return attribute + attributeGain;
 	}
 
 	/**
@@ -248,7 +323,7 @@ public abstract class Item {
 	 */
 	public static String generateDescriptor(float baseA, float baseB,
 			double aGauss, double bGauss, Object[] goodValues,
-			Object[] badValues, String normal) {
+			Object[] badValues, String normal, double normalVal) {
 		// Attack is dominant
 		double gauss = 0;
 		if (baseA >= baseB)
@@ -258,10 +333,10 @@ public abstract class Item {
 
 		// Choosing the prefix set.
 		Object[] prefixes = null;
-		if (gauss > ORDINARY)
-			prefixes = StrongPrefixes.values();
-		else if (gauss < -ORDINARY)
-			prefixes = WeakPrefixes.values();
+		if (gauss > normalVal)
+			prefixes = goodValues;
+		else if (gauss < -normalVal)
+			prefixes = badValues;
 		else
 			return normal;
 
@@ -288,7 +363,7 @@ public abstract class Item {
 	 *            The evasion gauss.
 	 * @return A suffix, or "" if the values aren't strong enough.
 	 */
-	private String generateSuffix(float baseHit, float baseEvasion,
+	public String generateSuffix(float baseHit, float baseEvasion,
 			double hitGauss, double evasionGauss) {
 		// If hit and evasion aren't used
 		if (baseHit == baseEvasion)
@@ -304,8 +379,9 @@ public abstract class Item {
 			badValues = WeakEvasionSuffixes.values();
 		}
 
+		// Less chance of a suffix
 		String suffix = generateDescriptor(baseHit, baseEvasion, hitGauss,
-				evasionGauss, goodValues, badValues, "");
+				evasionGauss, goodValues, badValues, "", ORDINARY * 5);
 		if (suffix.equals(""))
 			return "";
 		return " of " + suffix;
@@ -371,10 +447,26 @@ public abstract class Item {
 		return name_;
 	}
 
+	/**
+	 * Gets the ietm level.
+	 * 
+	 * @return The item level.
+	 */
+	public int getLevel() {
+		return level_;
+	}
+
 	@Override
 	public String toString() {
-		// Simple name for now.
-		return name_;
+		// If generic item, use simple name
+		if (!individual_)
+			return name_;
+		StringBuffer buffer = new StringBuffer("Level " + level_ + " " + name_ + "\n");
+		buffer.append("ATK: " + (int) Math.round(attack_) + ", ");
+		buffer.append("DEF: " + (int) Math.round(defense_) + ", ");
+		buffer.append("HIT: " + (int) Math.round(hit_) + ", ");
+		buffer.append("EVA: " + (int) Math.round(evasion_));
+		return buffer.toString();
 	}
 
 	@Override
