@@ -40,17 +40,14 @@ public abstract class Item {
 	/** The value, or cost of an item. */
 	private int baseValue_;
 
-	/** The base attack for the item. */
 	private float baseAttack_;
-
-	/** The amount of variance in the attack. */
 	private float attackVariance_;
-
-	/** The base defense for the item. */
 	private float baseDefense_;
-
-	/** The amount of variance in the defense. */
 	private float defenseVariance_;
+	private float baseHit_;
+	private float hitVariance_;
+	private float baseEvasion_;
+	private float evasionVariance_;
 
 	/** The random number generator for the mould. */
 	private Random random_;
@@ -72,11 +69,10 @@ public abstract class Item {
 	 */
 	private boolean individual_;
 
-	/** The attack of this item. */
 	private float attack_;
-
-	/** The defense of this item. */
 	private float defense_;
+	private float hit_;
+	private float evasion_;
 
 	/** The value of the item. */
 	private int value_;
@@ -105,11 +101,20 @@ public abstract class Item {
 	 *            The base defense of the item.
 	 * @param defenseVariance
 	 *            The amount of variance the defense can have.
+	 * @param baseAttack
+	 *            The base hit for the item.
+	 * @param attackVariance
+	 *            The amount of variance the hit can have.
+	 * @param baseDefense
+	 *            The base evasion of the item.
+	 * @param defenseVariance
+	 *            The amount of variance the evasion can have.
 	 */
 	public void initialiseMouldItem(String name, Map<String, Double> genres,
 			ProbabilityDistribution<Color> itemColors, int valueMod,
 			float baseAttack, float attackVariance, float baseDefense,
-			float defenseVariance) {
+			float defenseVariance, float baseHit, float hitVariance,
+			float baseEvasion, float evasion) {
 		individual_ = false;
 		name_ = name;
 		genres_ = genres;
@@ -138,14 +143,21 @@ public abstract class Item {
 	 *            The attack of the item.
 	 * @param defense
 	 *            The defense of the item.
+	 * @param hit
+	 *            The hit of the item.
+	 * @param evasion
+	 *            The evasion of the item.
 	 */
 	private void initialiseIndividualItem(Item generalItem, String name,
-			Color color, int actualValue, float attack, float defense) {
+			Color color, int actualValue, float attack, float defense,
+			float hit, float evasion) {
 		individual_ = true;
 		name_ = name;
 		genres_ = generalItem.genres_;
 		attack_ = Math.max(0, attack);
 		defense_ = Math.max(0, defense);
+		hit_ = Math.max(0, hit);
+		evasion_ = Math.max(0, evasion);
 		value_ = actualValue;
 	}
 
@@ -162,16 +174,24 @@ public abstract class Item {
 			float defense = (float) (baseDefense_ + defenseVariance_ * defGauss);
 			double atkGauss = random_.nextGaussian();
 			float attack = (float) (baseAttack_ + attackVariance_ * atkGauss);
-			int calculatedValue = calcItemValue(attack, defense);
+			double hitGauss = random_.nextGaussian();
+			float hit = (float) (baseHit_ + hitVariance_ * defGauss);
+			double evasionGauss = random_.nextGaussian();
+			float evasion = (float) (baseEvasion_ + evasionVariance_ * atkGauss);
+			int calculatedValue = calcItemValue(attack, defense, hit, evasion);
 			Color fixedColour = colourDistribution_.sample();
-			String name = generatePrefix(baseAttack_, baseDefense_, atkGauss,
-					defGauss)
-					+ " " + name_;
+			String name = generateDescriptor(baseAttack_, baseDefense_,
+					atkGauss, defGauss, StrongPrefixes.values(), WeakPrefixes
+							.values(), "Ordinary")
+					+ " "
+					+ name_
+					+ generateSuffix(baseHit_, baseEvasion_, hitGauss,
+							evasionGauss);
 
 			try {
 				Item unique = this.getClass().newInstance();
 				unique.initialiseIndividualItem(this, name, fixedColour,
-						calculatedValue, attack, defense);
+						calculatedValue, attack, defense, hit, evasion);
 				return unique;
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -181,49 +201,60 @@ public abstract class Item {
 	}
 
 	/**
-	 * Calculates the value of the item, based on the attack and defense
-	 * attributes.
+	 * Calculates the value of the item, based on the items attributes.
 	 * 
 	 * @param attack
 	 *            The attack value.
 	 * @param defense
 	 *            The defense value.
-	 * @return The value of the item, based on the attack and defense.
+	 * @param hit
+	 *            The hit value.
+	 * @param evasion
+	 *            The evasion value.
+	 * @return The value of the item, based on the attack, defense, hit and
+	 *         evasion.
 	 */
-	private int calcItemValue(float attack, float defense) {
+	private int calcItemValue(float attack, float defense, float hit,
+			float evasion) {
 		// If attack and defense are 0, just use the value
-		if ((attack + defense) <= 0)
+		if ((attack + defense + hit + evasion) <= 0)
 			return baseValue_;
-		
+
 		// Simply add and multiply.
 		// TODO Investigate alternative methods. Perhaps exponential?
-		return (int) ((attack + defense) * baseValue_);
+		return (int) ((attack + defense + hit + evasion) * baseValue_);
 	}
 
 	/**
-	 * Generates a prefix for this item, based on how good/bad it is. The suffix
-	 * chosen is based on the main attribute of the item, determined by whether
-	 * atk or def is higher.
+	 * Generates a descriptor, drawing a value from a list of values or, if the
+	 * item is plain,
 	 * 
-	 * @param baseAttack
+	 * @param baseA
 	 *            The base attack of the item.
-	 * @param baseDefense
+	 * @param baseB
 	 *            The base defense of the item.
-	 * @param atkGauss
+	 * @param aGauss
 	 *            The attack gaussian number.
-	 * @param defGauss
+	 * @param bGauss
 	 *            The defense gaussian number.
+	 * @param goodValues
+	 *            The good values.
+	 * @param badValues
+	 *            The bad values.
+	 * @param normal
+	 *            The normal value.
 	 * @return A string prefix corresponding to the dominant attribute gaussian
 	 *         value.
 	 */
-	public static String generatePrefix(float baseAttack, float baseDefense,
-			double atkGauss, double defGauss) {
+	public static String generateDescriptor(float baseA, float baseB,
+			double aGauss, double bGauss, Object[] goodValues,
+			Object[] badValues, String normal) {
 		// Attack is dominant
 		double gauss = 0;
-		if (baseAttack >= baseDefense)
-			gauss = atkGauss;
+		if (baseA >= baseB)
+			gauss = aGauss;
 		else
-			gauss = defGauss;
+			gauss = bGauss;
 
 		// Choosing the prefix set.
 		Object[] prefixes = null;
@@ -232,7 +263,7 @@ public abstract class Item {
 		else if (gauss < -ORDINARY)
 			prefixes = WeakPrefixes.values();
 		else
-			return "Ordinary";
+			return normal;
 
 		// Normalise the value between 0 and 1 and use it as index lookup
 		gauss = Math.abs(gauss);
@@ -241,6 +272,43 @@ public abstract class Item {
 		gauss = (gauss > 1) ? 1 : gauss;
 		int index = (int) Math.floor((prefixes.length - 1) * gauss);
 		return prefixes[index].toString();
+	}
+
+	/**
+	 * Generates a suffix if the hit or evasion gaussian values are particularly
+	 * good/bad.
+	 * 
+	 * @param baseHit
+	 *            The base hit.
+	 * @param baseEvasion
+	 *            The base evasion
+	 * @param hitGauss
+	 *            The hit gauss.
+	 * @param evasionGauss
+	 *            The evasion gauss.
+	 * @return A suffix, or "" if the values aren't strong enough.
+	 */
+	private String generateSuffix(float baseHit, float baseEvasion,
+			double hitGauss, double evasionGauss) {
+		// If hit and evasion aren't used
+		if (baseHit == baseEvasion)
+			return "";
+		Object[] goodValues = null;
+		Object[] badValues = null;
+
+		if (baseHit > baseEvasion) {
+			goodValues = StrongHitSuffixes.values();
+			badValues = WeakHitSuffixes.values();
+		} else {
+			goodValues = StrongEvasionSuffixes.values();
+			badValues = WeakEvasionSuffixes.values();
+		}
+
+		String suffix = generateDescriptor(baseHit, baseEvasion, hitGauss,
+				evasionGauss, goodValues, badValues, "");
+		if (suffix.equals(""))
+			return "";
+		return " of " + suffix;
 	}
 
 	/**

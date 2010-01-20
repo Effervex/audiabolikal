@@ -11,6 +11,8 @@ import org.junit.Test;
 
 import audiabolikal.equipment.Headgear;
 import audiabolikal.equipment.Item;
+import audiabolikal.equipment.StrongPrefixes;
+import audiabolikal.equipment.WeakPrefixes;
 import audiabolikal.util.ProbabilityDistribution;
 
 public class ItemTest {
@@ -27,7 +29,8 @@ public class ItemTest {
 		ProbabilityDistribution<Color> itemColors = new ProbabilityDistribution<Color>();
 		itemColors.add(Color.GRAY, 1);
 		Item item = new Headgear();
-		item.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		item.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5,
+				0, 0, 0, 0);
 		System.out.println("Check item names");
 		for (int i = 0; i < 10; i++) {
 			Item unique = item.spawnIndividualItem();
@@ -53,16 +56,22 @@ public class ItemTest {
 	}
 
 	@Test
-	public void testGeneratePrefix() {
+	public void testGenerateDescriptor() {
 		// No variance
-		assertEquals("Ordinary", Item.generatePrefix(40, 20, 0, 0));
-		assertEquals("Ordinary", Item.generatePrefix(40, 20, 0, 3));
+		assertEquals("Ordinary", Item.generateDescriptor(40, 20, 0, 0,
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
+		assertEquals("Ordinary", Item.generateDescriptor(40, 20, 0, 3,
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
 
 		// Extremes
-		assertEquals("Godly", Item.generatePrefix(40, 20, 3, 0));
-		assertEquals("Broken", Item.generatePrefix(40, 20, -3, 0));
-		assertEquals("Godly", Item.generatePrefix(40, 80, 0, 3));
-		assertEquals("Broken", Item.generatePrefix(40, 80, 0, -3));
+		assertEquals("Godly", Item.generateDescriptor(40, 20, 3, 0,
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
+		assertEquals("Broken", Item.generateDescriptor(40, 20, -3, 0,
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
+		assertEquals("Godly", Item.generateDescriptor(40, 80, 0, 3,
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
+		assertEquals("Broken", Item.generateDescriptor(40, 80, 0, -3,
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
 	}
 
 	@Test

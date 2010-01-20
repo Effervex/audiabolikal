@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import audiabolikal.util.MultiMap;
+
 /**
  * A class which organises the tags into a hierarchical graph. The graph must
  * not contain loops! This class is used to share information between general
@@ -25,13 +27,13 @@ public class TagHierarchy {
 	private static TagHierarchy instance_;
 
 	/** The tag relations, given higher tags and their weights. */
-	private Map<String, List<WeightedRelation>> relations_;
+	private MultiMap<String, WeightedRelation> relations_;
 
 	/**
 	 * The inverse of the tag relations, denoting which non-leaf tags are
 	 * parents of other tags, for efficient looup.
 	 */
-	private Map<String, Set<String>> childMap_;
+	private MultiMap<String, String> childMap_;
 
 	/** The roots of the hierarchy (no parents). */
 	private Set<String> roots_;
@@ -53,7 +55,7 @@ public class TagHierarchy {
 	 *            The tag file to read from.
 	 */
 	private void initialise(File tagFile) {
-		Map<String, List<WeightedRelation>> tuples = new HashMap<String, List<WeightedRelation>>();
+		MultiMap<String, WeightedRelation> tuples = new MultiMap<String, WeightedRelation>();
 
 		try {
 			FileReader reader = new FileReader(tagFile);
@@ -68,15 +70,13 @@ public class TagHierarchy {
 					split[i] = split[i].replaceAll("\"", "");
 				}
 
-				// Check if the key already exists
-				List<WeightedRelation> relation = tuples.get(split[0]);
-				if (relation == null) {
-					relation = new ArrayList<WeightedRelation>();
-					tuples.put(split[0], relation);
+				// Check if the key already exists, and overwrite it if better
+				WeightedRelation wr = new WeightedRelation(split[1], Float
+						.parseFloat(split[2]));
+				if (!tuples.putContains(split[0], wr)) {
+					addWeightedRelation(null, new WeightedRelation(split[1],
+							Float.parseFloat(split[2])), tuples.get(split[0]));
 				}
-
-				addWeightedRelation(null, new WeightedRelation(split[1], Float
-						.parseFloat(split[2])), relation);
 			}
 
 			bf.close();
@@ -97,12 +97,12 @@ public class TagHierarchy {
 	 *            The mapping of tuples, extending only to immediate parents.
 	 * @return A joined mapping of tuples, extending beyond parents.
 	 */
-	private Map<String, List<WeightedRelation>> flattenTuples(
-			Map<String, List<WeightedRelation>> tuples) {
-		Map<String, List<WeightedRelation>> flattened = new HashMap<String, List<WeightedRelation>>();
+	private MultiMap<String, WeightedRelation> flattenTuples(
+			MultiMap<String, WeightedRelation> tuples) {
+		MultiMap<String, WeightedRelation> flattened = new MultiMap<String, WeightedRelation>();
 
 		// The children efficiency map
-		childMap_ = new HashMap<String, Set<String>>();
+		childMap_ = new MultiMap<String, String>();
 		// Two sets for examining the structure of the hierarchy.
 		leaves_ = new HashSet<String>();
 		roots_ = new HashSet<String>();
@@ -130,8 +130,8 @@ public class TagHierarchy {
 	 *            A collection for tracing loops.
 	 */
 	private List<WeightedRelation> recursiveParentFind(String tagKey,
-			Map<String, List<WeightedRelation>> flattened,
-			Map<String, List<WeightedRelation>> tuples, Set<String> loopTrace) {
+			MultiMap<String, WeightedRelation> flattened,
+			MultiMap<String, WeightedRelation> tuples, Set<String> loopTrace) {
 		// Stopping condition: If tuples doesn't contain the key return null.
 		if (!tuples.containsKey(tagKey)) {
 			roots_.add(tagKey);
@@ -176,7 +176,7 @@ public class TagHierarchy {
 		}
 
 		// Add the tag key to the flattened list, so it isn't looped.
-		flattened.put(tagKey, flattenedParents);
+		flattened.putCollection(tagKey, flattenedParents);
 		loopTrace.remove(tagKey);
 
 		return flattenedParents;
@@ -205,13 +205,7 @@ public class TagHierarchy {
 
 			if (child != null) {
 				// Adding to the child map
-				Set<String> children = childMap_.get(weightedRelation
-						.getRelation());
-				if (children == null) {
-					children = new HashSet<String>();
-					childMap_.put(weightedRelation.getRelation(), children);
-				}
-				children.add(child);
+				childMap_.putContains(weightedRelation.getRelation(), child);
 			}
 		} else {
 			WeightedRelation inList = bestRelations.get(index);
@@ -262,7 +256,7 @@ public class TagHierarchy {
 	 *            The parent tag of the children.
 	 * @return The children of the parent, or null.
 	 */
-	public Set<String> getChildren(String parent) {
+	public List<String> getChildren(String parent) {
 		return childMap_.get(parent);
 	}
 
