@@ -336,4 +336,35 @@ public class MultiMap<K, V> {
 	public Collection<List<V>> valuesLists() {
 		return innerMap_.values();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((innerMap_ == null) ? 0 : innerMap_.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final MultiMap other = (MultiMap) obj;
+		if (innerMap_ == null) {
+			if (other.innerMap_ != null)
+				return false;
+		} else if (!innerMap_.equals(other.innerMap_))
+			return false;
+		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return innerMap_.toString();
+	}
 }
