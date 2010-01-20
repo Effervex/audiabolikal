@@ -71,13 +71,14 @@ Suffixes differ from prefixes in that both Hit and Evasion have individual stron
 An item has a level, increasing the strength of the item's effectiveness. Each attribute of an item is increased with each level, even attributes with no base or variance.
 
 The levelling formula per level is as follows:
- * attribute += B × base + M × variance × |gauss|
-where B = 0.1 and M = 0.2. Also, if this gain is less than M, it is set to M.
+ * B × (base + V / 2).
+where B = 0.1 and V is the difference between the base and actual of the item on creation. So V can very well be negative, though V / 2 should not drop below -B. If this gain is less than M (M = 0.2), it is set to M. This helps values with base,V = 0 increase.
 
-A level 2 _Axe_ with base attack 40, variance 15, and level 1 attack 56 could have an attack of:
- * 56 += 0.1 × 40 + 0.2 × 15 × 0.84
- * 56 += 4 + 2.52
- * = 62.52
+A level 5 _Good Axe_ with base attack 40 and level 1 attack 56 (resulting in V = 16) will have an attack of:
+ * 56 += (5) × 0.1 × (40 + 16 / 2)
+ * 56 += (5) × 0.1 × 48
+ * 56 += 24
+ * = 80
 
 Naturally, the values of the item will affect the cost, though perhaps the level itself can also factor into the cost.
 
