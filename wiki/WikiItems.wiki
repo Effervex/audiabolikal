@@ -40,7 +40,7 @@ An item is defined by a general definition (or mould) of item, be it headgear, w
  * The genres the item relates to and how much it relates to them.
  * The colours an item can take on. Note that an item can be of multiple colours, though an individual item will remain a single colour.
  * The general value of an item. Note this isn't the value of a normal item of that type, it relates to the attributes of an item. So an item with ATK:10 and DEF:10 with VALUE:10 will have {{{(10 + 10) * 10 = 200}}} value in a simple multiplication value calculation (this is subject to change).
- * The base attack and defense with variance values. This means that an item will have ATK and DEF equal to these base values +- the variance in a normal distribution. Assuming that a normal distribution has maximum 2.3 SDs, this will result in an item at it's worst 2.3 variances from the base value. For example, an _Axe_ (typically varianced) with BaseATK:40 and VarATK:15 could generate an _Axe_ with ATK:10 (-2 SDs from base) or perhaps ATK:70.
+ * The base attack, defense, hit and evasion with variance values. This means that an item will have ATK, DEF, HIT and EVA equal to these base values +- the variance in a normal distribution. Assuming that a normal distribution has maximum 2.3 SDs, this will result in an item at it's worst 2.3 variances from the base value. For example, an _Axe_ (typically varianced) with BaseATK:40 and VarATK:15 could generate an _Axe_ with ATK:10 (-2 SDs from base) or perhaps ATK:70.
  * The mesh and texture of the item. This can also be split into male and female parts too.
 
 
@@ -48,6 +48,8 @@ An item is defined by a general definition (or mould) of item, be it headgear, w
 = Individual Item =
 
 Much of this information only applies to the general item, so when an individual item is generated, its values are set to concrete values, based on the mould.
+
+Furthermore individual items have levels, which allow a series of stronger items to be created through levels. Though it is unclear currently if items can be levelled _ala_ Disgaea, but they can be generated at a set level.
 
 == Item Condition and Prefixes ==
 
@@ -57,12 +59,25 @@ Because items have an initial condition, an optional gameplay feature is to incl
 
 Though colour is determined by the mould, the saturation of the colour can be effected by the item condition. An item of good or average durability will have the regular colour, but items in worse condition will have a progressively more faded appearance, signifying usage. Of course, this doesn't work for white items, but it may be a handy effect.
 
+
 == Suffixes ==
 
-Suffixes could also relate to tags, perhaps the genre tag that generated the item, perhaps something else. In order to set this up, the `TagHierarchy` could be extended to include words that relate to genres ('metal': "of Brutality", 'pop': "of Pogo Sticking?").
+Suffixes are based on the Hit and Evasion attributes. Not every item will use these attributes but those that do, and have relatively high or low attribute values in relation to the base attribute will have a suffix which reflects this. For example, a _Sword_ with high hit (relative to base hit) could be suffixed _Sword of Sure-strike_. Conversely, a low hit could be suffixed _Sword of Clumsiness_.
 
-Another possibility is to use artist names in the items, which become stronger when given to the artist in question. These artist names need to come from somewhere, preferably an exterior source of the user so they don't only get artists that they've used. Maybe Last.fm could be used?
+Suffixes differ from prefixes in that both Hit and Evasion have individual strong and weak suffixes, as opposed to Attack and Defense sharing the same stroing and weak prefixes. This is because Hit and Evasion are 'secondary' attributes, whereas a Strong Helmet implies the armour of the helmet is strong, not the attack.
 
+
+== Levelling ==
+An item has a level, increasing the strength of the item's effectiveness. Each attribute of an item is increased with each level, even attributes with no base or variance.
+
+The levelling formula per level is as follows:
+attribute += B × base + M × variance × |gauss|
+where B = 0.1 and M = 0.2. Also, if this gain is less than M, it is set to M.
+
+A level 2 _Axe_ with base attack 40, variance 15, and level 1 attack 56 could have an attack of:
+56 += 0.1 × 40 + 0.2 × 15 × 0.84
+56 += 4 + 2.52
+= 62.52
 
 
 = Item Genre =
