@@ -1,47 +1,41 @@
 package audiabolikal.equipment;
 
 /**
- * TODO
  * An ordered enumeration (from worst to best) of strong prefix words.
  * 
  * @author Samuel J. Sarjant
  */
 public enum StrongHitSuffixes {
-	EFFECTIVE("Effective"),
-	HARD("Hard"),
-	WELL_MADE("Well-made"),
-	ENDURING("Enduring"),
-	TOUGH("Tough"),
-	FORMIDABLE("Formidable"),
-	STRAPPING("Strapping"),
-	TENACIOUS("Tenacious"),
-	DURABLE("Durable"),
-	SOLID("Solid"),
-	STRONG("Strong"),
-	ROBUST("Robust"),
-	REINFORCED("Reinforced"),
-	UNYIELDING("Unyielding"),
-	HEAVY_DUTY("Heavy-duty"),
-	POTENT("Potent"),
-	GREAT("Great"),
-	MIGHTY("Mighty"),
-	PERFECT("Perfect"),
-	LEGENDARY("Legendary"),
-	GODLY("Godly");
+	TARGETING("Targeting"),
+	SKILL("Skill"),
+	CLOBBERING("Clobbering"),
+	VERITY("Verity"),
+	SURENESS("Sureness"),
+	SMACKING("Smacking"),
+	STRIKING("Striking"),
+	ACCURACY("Accuracy"),
+	LUCKINESS("Luckiness"),
+	DEFINITUDE("Definitude"),
+	WALLOPING("Walloping"),
+	WHOMPING("Whomping"),
+	SURE_STRIKE("Sure-strike"),
+	EXACTITUDE("Exactitude"),
+	MASTERY("Mastery"),
+	SUPREME_LUCK("Supreme Luck");
 	
-	/** The prefix. */
-	private String prefix_;
+	/** The suffix. */
+	private String suffix_;
 	
 	/**
 	 * A basic constructor.
 	 * 
-	 * @param prefix The prefix.
+	 * @param suffix The suffix.
 	 */
-	private StrongHitSuffixes(String prefix) {
-		prefix_ = prefix;
+	private StrongHitSuffixes(String suffix) {
+		suffix_ = suffix;
 	}
 	
 	public String toString() {
-		return prefix_;
+		return suffix_;
 	}
 }

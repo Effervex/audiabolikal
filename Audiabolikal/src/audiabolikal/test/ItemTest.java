@@ -29,20 +29,27 @@ public class ItemTest {
 		ProbabilityDistribution<Color> itemColors = new ProbabilityDistribution<Color>();
 		itemColors.add(Color.GRAY, 1);
 		Item item = new Headgear();
-		item.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5,
-				0, 0, 0, 0);
+		item.initialiseMouldItem("Helm", genres, itemColors, 50, 0, 0, 40, 5,
+				10, 2, 5, 1);
 		System.out.println("Check item names");
 		for (int i = 0; i < 10; i++) {
-			Item unique = item.spawnIndividualItem();
-			System.out.println("   " + unique);
+			Item unique = item.spawnIndividualItem(1, true);
+			System.out.println(unique);
 			assertNotNull(unique);
 			assertTrue(unique instanceof Headgear);
-			assertTrue(unique.getName().contains("helm"));
+			assertTrue(unique.getName().contains("Helm"));
 			assertEquals(unique.getGenres(), genres.keySet());
-			assertEquals(unique.getValue(), 2000, 666);
+			assertEquals(unique.getValue(), 2750, 892);
 			assertEquals(unique.getAttack(), 0, 0);
-			assertEquals(unique.getDefense(), 40, 12);
+			assertEquals(unique.getDefense(), 40, 14);
+			assertEquals(unique.getLevel(), 1, 0);
+			System.out.println();
 		}
+	}
+	
+	@Test
+	public void testApplyLevel() {
+		fail("Not yet implemented");
 	}
 
 	@Test
@@ -59,19 +66,19 @@ public class ItemTest {
 	public void testGenerateDescriptor() {
 		// No variance
 		assertEquals("Ordinary", Item.generateDescriptor(40, 20, 0, 0,
-				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary", 0.1));
 		assertEquals("Ordinary", Item.generateDescriptor(40, 20, 0, 3,
-				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary", 0.1));
 
 		// Extremes
 		assertEquals("Godly", Item.generateDescriptor(40, 20, 3, 0,
-				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary", 0.1));
 		assertEquals("Broken", Item.generateDescriptor(40, 20, -3, 0,
-				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary", 0.1));
 		assertEquals("Godly", Item.generateDescriptor(40, 80, 0, 3,
-				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary", 0.1));
 		assertEquals("Broken", Item.generateDescriptor(40, 80, 0, -3,
-				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary"));
+				StrongPrefixes.values(), WeakPrefixes.values(), "Ordinary", 0.1));
 	}
 
 	@Test

@@ -7,28 +7,34 @@ package audiabolikal.equipment;
  * @author Samuel J. Sarjant
  */
 public enum WeakEvasionSuffixes {
-	FADED("Faded"), GRUBBY("Grubby"), FATIGUED("Fatigued"), USED("Used"), WORN(
-			"Worn"), DAMAGED("Damaged"), DULL("Dull"), WEAKENED("Weakened"), DECAYED(
-			"Decayed"), POOR("Poor"), DELICATE("Delicate"), DETERIORATED(
-			"Deteriorated"), OLD("Old"), FRAIL("Frail"), FLIMSY("Flimsy"), PUNY(
-			"Puny"), FAULTY("Faulty"), RICKETY("Rickety"), DEGRADED("Degraded"), MAKESHIFT(
-			"Makeshift"), FRAGILE("Fragile"), PATHETIC("Pathetic"), JOKE("Joke"), USELESS(
-			"Useless"), BROKEN("Broken");
+	HESISTATION("Hesistation"),
+	DAWDLING("Dawdling"),
+	HEAVY_HANDEDNESS("Heavy-handedness"),
+	WAITING("Waiting"),
+	INEPTITUDE("Ineptitude"),
+	STUMBLING("Stumbling"),
+	GRACELESSNESS("Gracelessness"),
+	CLUMSINESS("Clumsiness"),
+	SLOTH("Sloth"),
+	BLUNDERING("Blundering"),
+	UNLUCKINESS("Unluckiness"),
+	MASOCHISM("Masochism"),
+	CALAMITY("Calamity"),
+	CURSES("Curses");
 
-	/** The prefix. */
-	private String prefix_;
-
+	/** The suffix. */
+	private String suffix_;
+	
 	/**
 	 * A basic constructor.
 	 * 
-	 * @param prefix
-	 *            The prefix.
+	 * @param suffix The suffix.
 	 */
-	private WeakEvasionSuffixes(String prefix) {
-		prefix_ = prefix;
+	private WeakEvasionSuffixes(String suffix) {
+		suffix_ = suffix;
 	}
-
+	
 	public String toString() {
-		return prefix_;
+		return suffix_;
 	}
 }
