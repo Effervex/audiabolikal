@@ -2,6 +2,7 @@ package audiabolikal;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +39,7 @@ public class TagEquipmentDistribution {
 		Set<String> associatedGenres = item.getGenres();
 		// For every genre the item is linked to.
 		for (String genre : associatedGenres) {
-			Set<String> children = tagHierarchy_.getChildren(genre);
+			List<String> children = tagHierarchy_.getChildren(genre);
 			// Counting the children, if there are some.
 			int numChildren = 0;
 			Iterator<String> childIter = null;
@@ -135,6 +136,7 @@ public class TagEquipmentDistribution {
 	 * @return The probability of the item being chosen or -1.
 	 */
 	public double getProbability(String tag, Item item) {
+		// TODO Modify the multimap to deal with the Probability Distribution
 		Map<String, ProbabilityDistribution<Item>> eD = tagEquipmentDistribution_
 				.get(tag);
 		if (eD != null) {

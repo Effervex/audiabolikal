@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
-import audiabolikal.equipment.Item;
-
 /**
  * A class representing a probability distribution of values. These values are
  * sampled randomly according to their probabilities.

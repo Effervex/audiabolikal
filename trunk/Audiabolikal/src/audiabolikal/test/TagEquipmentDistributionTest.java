@@ -32,7 +32,7 @@ public class TagEquipmentDistributionTest {
 		ProbabilityDistribution<Color> itemColors = new ProbabilityDistribution<Color>();
 		itemColors.add(Color.GRAY, 1);
 		Item helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.insertItem(helm);
 		assertEquals(sut_.getProbability("melodic thrash metal", helm), 0.8d, EPSILON);
 		
@@ -40,7 +40,7 @@ public class TagEquipmentDistributionTest {
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 0.8d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		assertEquals(sut_.getProbability("thrash metal", helm), 0.8f, EPSILON);
@@ -50,7 +50,7 @@ public class TagEquipmentDistributionTest {
 		genres = new HashMap<String, Double>();
 		genres.put("metal", 0.8d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		assertEquals(sut_.getProbability("metal", helm), 0.8d, EPSILON);
@@ -62,7 +62,7 @@ public class TagEquipmentDistributionTest {
 		genres.put("melodic thrash metal", 0.8d);
 		genres.put("progressive rock", 0.2d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		assertEquals(sut_.getProbability("melodic thrash metal", helm), 0.8d, EPSILON);
@@ -73,7 +73,7 @@ public class TagEquipmentDistributionTest {
 		genres.put("thrash metal", 0.8d);
 		genres.put("progressive rock", 0.2d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		assertEquals(sut_.getProbability("thrash metal", helm), 0.8d, EPSILON);
@@ -85,7 +85,7 @@ public class TagEquipmentDistributionTest {
 		genres.put("metal", 1d);
 		genres.put("rock", 0.5d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		assertEquals(sut_.getProbability("metal", helm), 1d, EPSILON);
@@ -97,7 +97,7 @@ public class TagEquipmentDistributionTest {
 		genres.put("thrash metal", 0.8d);
 		genres.put("melodic thrash metal", 0.9d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		assertEquals(sut_.getProbability("thrash metal", helm), 0.8d, EPSILON);
@@ -112,7 +112,7 @@ public class TagEquipmentDistributionTest {
 		ProbabilityDistribution<Color> itemColors = new ProbabilityDistribution<Color>();
 		itemColors.add(Color.GRAY, 1);
 		Item helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.insertItem(helm);
 		sut_.normaliseAll();
 		assertEquals(sut_.getProbability("melodic thrash metal", helm), 1d, EPSILON);
@@ -121,7 +121,7 @@ public class TagEquipmentDistributionTest {
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 0.8d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		sut_.normaliseAll();
@@ -131,11 +131,11 @@ public class TagEquipmentDistributionTest {
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 1d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 1d);
 		Headgear hat = new Headgear();
-		hat.initialiseMouldItem("hat", genres, itemColors, 20, 0, 0, 10, 2);
+		hat.initialiseMouldItem("hat", genres, itemColors, 20, 0, 0, 10, 2, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		sut_.insertItem(hat);
@@ -147,11 +147,11 @@ public class TagEquipmentDistributionTest {
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 1d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 0.6d);
 		hat = new Headgear();
-		hat.initialiseMouldItem("hat", genres, itemColors, 20, 0, 0, 10, 2);
+		hat.initialiseMouldItem("hat", genres, itemColors, 20, 0, 0, 10, 2, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		sut_.insertItem(hat);
@@ -168,7 +168,7 @@ public class TagEquipmentDistributionTest {
 		ProbabilityDistribution<Color> itemColors = new ProbabilityDistribution<Color>();
 		itemColors.add(Color.GRAY, 1);
 		Item helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.insertItem(helm);
 		sut_.normaliseAll();
 		Item sample = sut_.sample("melodic thrash metal", "Headgear");
@@ -180,7 +180,7 @@ public class TagEquipmentDistributionTest {
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 0.8d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		sut_.normaliseAll();
@@ -193,11 +193,11 @@ public class TagEquipmentDistributionTest {
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 1d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 1d);
 		Item hat = new Headgear();
-		hat.initialiseMouldItem("hat", genres, itemColors, 20, 0, 0, 10, 2);
+		hat.initialiseMouldItem("hat", genres, itemColors, 20, 0, 0, 10, 2, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		sut_.insertItem(hat);
@@ -219,11 +219,11 @@ public class TagEquipmentDistributionTest {
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 9d);
 		helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
 		genres = new HashMap<String, Double>();
 		genres.put("thrash metal", 1d);
 		hat = new Headgear();
-		hat.initialiseMouldItem("hat", genres, itemColors, 20, 0, 0, 10, 2);
+		hat.initialiseMouldItem("hat", genres, itemColors, 20, 0, 0, 10, 2, 0, 0, 0, 0);
 		sut_.clear();
 		sut_.insertItem(helm);
 		sut_.insertItem(hat);
