@@ -1,0 +1,50 @@
+#summary How the storyline, or flow of the game will proceed
+
+= Introduction =
+
+Storyline is key to an RPG game's success, so this one should be no exception. Because the game title hinges on diabolical audio (evil songs), it should involve some form of evil working its way into music.
+
+
+= Overarching storyline =
+Ideally, because the game is based on probabilities and levels, it could go on infinitely, so an infinite storyline of sorts would also be good, but alas, that is impossible. Most tactical RPGs finish their story mode around the level 40-50 mark, so assuming growth of 1 level per battle, that's around 40-50 battles.
+
+There are several ways I could go with the storyline. Here are some possibilities. These could be mixed and matched.
+
+
+== World trotting ==
+While not so much a plot as a means for achieving a plot, world trotting involves travelling across the world and fighting local bands, or local genres (black metal in Norway, Blues in Louisiana, Tribal in Africa, etc).
+
+This method of fighting would most likely be used as a means for fighting varied battles.
+
+
+== Record company subversion ==
+The record companies have performed tests and have found a formula for creating a singular beat/rhythm of music (_Heh, Pop music. But it should remained unnamed_) that supposedly everyone likes. Their goal is to infect all bands under their labels and in one instant control all bands to create the same music.
+
+This plot seems a little stilted, but it has the right idea in mind.
+
+
+== Nefarious multi-storyline deeds ==
+Generalising on the whole evil thingy, the game could be split into several storylines, driven by the user's guidance (_ala_ Soul Calibur 3 storyline). Using the avatar, the user can define an end goal, or perhaps simply work towards that goal through their own choices. The possible goals for storyline are:
+ * (Good path) An evil presence has invaded music and bands. You and your band comrades set out to find and destroy the root of the evil, battling infected bands on the way.
+ * (Evil path) You have been infected with the evil presence, but seek to take command of and control the evil, becoming an evil overlord (of music).
+ * (Neutral path) Ignoring the whole evil presence thing, you and your bands are simply out for fame and fortune.
+
+
+= Battle set-up =
+Battles could be set up to face enemies mainly of one tag, such as 'black metal' or what-have-you. The tag could have a small plot-line associated with it (Black metal has got blacker, with bands freely allowing the evil into their bodies). Tags need not necessarily be of genres, as Last.fm also has tags concerning other things (female-vocalist, 80s, singer-songwriter, etc).
+
+Though the battles could be randomly generated, it would be nice to have some form of interaction between the player and enemies beforehand.
+
+
+== Festival mode ==
+Festival mode simply allows the player to fight bands from a particular festival (which has a minimum number of bands for a challenge) from past festivals. If a festival happens to contain many, many bands (BDO), the battles could be broken up in order of band popularity (or headline listing), such that the first battle is of low bands, leading up to headliner acts.
+
+The initial plan was to set the level of the battle at the number of attendees, but Last.fm isn't great for those numbers. Instead, the level of the battle can be determined by the number of artists present and other information about the festival.
+
+While it could be possible for a user to search for an event and generate the appropriate battles for it, it may be better to just compile a list of famous festivals or shows (Download, Ozzfest, BDO, Woodstock, maybe a particular Michael Jackson show).
+
+
+= Game navigation and feedback =
+A typical thing to see in games is a helper avatar to guide the user on what to do and provide an interface between the user and the game. This avatar could also come in several forms, perhaps with a choice of the top parent tags (metal, pop, rock, rap, etc).
+
+The avatar can help the user in the early tutorial stage, and also provide pre- and post-battle interaction between enemies.
