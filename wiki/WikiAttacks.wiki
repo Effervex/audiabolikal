@@ -32,7 +32,9 @@ A problem with this song sampling is that it may be quite memory intensive in th
 
 
 = Levelling up attacks =
-The more an attack is used, the more ATK-EXP it receives, allowing the user to increase the capabilities of the attack by increasing properties of the attack. Initially the attack may have a few properties generated from the initialisation, but in a skill fashion, the user can add capabilities to the attack.
+The more an attack is used, the more ATK-EXP it receives, allowing the user to increase the capabilities of the attack by increasing properties of the attack. Initially the attack has a single property generated from the initialisation, but in a skill fashion, the user can add capabilities to the attack.
+
+As well as receiving ATK-EXP for using the attack, the user receives free ATK-EXP based on how much that track has been listened to using Last.fm. The current coefficient for free ATK-EXP is 0.1 of the total track counts for the user overall (floored). So a track listened to 85 times and created into an attack will get a free 8 ATK-EXP, plus the initial attack bonus.
 
 Each attack boost has 10 levels. Graphically, the attack animation is scaled with each level:
 
@@ -138,15 +140,15 @@ Weaken temporarily decreases an enemy's attack for 3-5 turns.
 
 
 == Corrode ==
-Weaken temporarily decreases an enemy's defense for 3-5 turns.
+Corrode temporarily decreases an enemy's defense for 3-5 turns.
  * 2% decrease in enemy defense per level for the duration of 3-5 turns.
 
 
-== Blur ==
-Weaken temporarily decreases an enemy's hit for 3-5 turns.
+== Blear ==
+Blear temporarily decreases an enemy's hit for 3-5 turns.
  * 2% decrease in enemy hit per level for the duration of 3-5 turns.
 
 
 == Slow ==
-Weaken temporarily decreases an enemy's evasion for 3-5 turns.
+Slow temporarily decreases an enemy's evasion for 3-5 turns.
  * 2% decrease in enemy evasion per level for the duration of 3-5 turns.
