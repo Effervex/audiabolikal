@@ -9,7 +9,7 @@ The types of attacks the soldiers will be using will be great and many. Sure you
 An attack is represented by a song title by that particular artist (Strapping Young Lad uses Decimator). The attack is formed at the point that the file is selected. An attack's details are generated based on ID3 data scanned from the file. The scan could take the form of track number × V1 + title (character by character × V#) + album (character by character × V#). The V values are simply prime constants designed to create a large integer to be used as a seed for a random number generator.
 
 The random number generator can then be used to generate:
- * Attack type: There are multiple types of attack {downward, forehand, backhand, top-left to bottom-right, top-right to bottom-left, spinning L-R, spinning R-L, thrusting, magical}. Each attack has a different animation and properties.
+ * Attack type: There are multiple types of attack {downward, forehand, backhand, top-left to bottom-right, top-right to bottom-left, spinning L-R, spinning R-L, thrusting, magical, blasting}. Each attack has a different animation and properties.
  * Initial attack properties. An attack can have multiple properties, shown in the Levelling up attacks section. Initially an attack may only have a few properties (maybe 1 or 2).
 
 
@@ -85,6 +85,13 @@ Other skills combined with greater range are also affected by the damage percent
 ||5||3||1||X||1||3||5||
 || || || ||2|| || || ||
 || || || ||4|| || || ||
+
+*Blasting*
+||5|| ||3|| ||3|| ||5||
+|| ||2|| ||4|| ||2|| ||
+|| || ||1||4||1|| || ||
+|| || || ||0|| || || ||
+|| || || ||X|| || || ||
 
 In total, the final damage output of a maxed out attack range is 700% spread across the squares
 
