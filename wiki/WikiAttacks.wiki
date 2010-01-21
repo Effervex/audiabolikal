@@ -45,7 +45,7 @@ This causes the attack to hit more than one square, though attacks not in the pr
 Each type of attack also has a fixed range extension. The numbers of the table indicate the levels of range purchases (where squares can only be purchased when all squares of the previous level have been purchased). 0 indicates the original range. X indicates the soldier.
 
 *Important*
-Other skills combined with greater range are also affected by the damage percentages. The greater damage is a simple matter of multiplying the modifiers, while the chance based skills (Rebuff, Steal, Poison, Weaken, etc). Greater height and repositioning are unaffected and apply to all squares.
+Other skills combined with greater range are also affected by the damage percentages. The greater damage is a simple matter of multiplying the modifiers, while the chance based skills (Rebuff, Steal, Poison, Weaken, etc) need to be multiplied by the modifiers. Greater height and repositioning are unaffected and apply to all squares.
 
 *Downward strike*
 ||5||3||5||
