@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 
@@ -92,16 +93,17 @@ public class AttackAttributes {
 	 */
 	public Map<Point, DamageDetail> getAttackDetails(AttackType type,
 			Point soldierDirection) {
+		// TODO Store the computed information and update when levelled up.
 		Map<Point, DamageDetail> attackPoints = new HashMap<Point, DamageDetail>();
 
-		int rangeLevel = greaterRange_ / 2;
+		int rangeLevel = (greaterRange_ + 1) / 2;
 		int rangeIndex = 2;
 		// Odd level
 		if ((greaterRange_ & 1) != 0) {
 			rangeIndex = rangeLevelIndex_;
 		}
-		Collection<Pair<Point, Float>> rawPoints = RangePoints.getRangedPoints(
-				type, rangeLevel, rangeIndex);
+		Collection<Pair<Point, Float>> rawPoints = getRangedPoints(
+				type, rangeLevel, rangeIndex, RANGE_DAMAGE_PER_LEVEL);
 
 		// Calculate the rotation
 		double rotation = 0;
@@ -122,8 +124,8 @@ public class AttackAttributes {
 			// Rotate the point
 			Point point2 = point.getA();
 			if (rotation != 0) {
-				point2 = new Point((int) (Math.cos(rotation) * point2.x
-						- Math.sin(rotation) * point2.y), (int) (Math.sin(rotation)
+				point2 = new Point((int) Math.round(Math.cos(rotation) * point2.x
+						- Math.sin(rotation) * point2.y), (int) Math.round(Math.sin(rotation)
 						* point2.x + Math.cos(rotation) * point2.y));
 			}
 			
@@ -145,14 +147,14 @@ public class AttackAttributes {
 		dd.setDamagePercent(1 + greaterDamage_ * DAMAGE_PER_LEVEL);
 
 		// Height
-		dd.setDamagePercent(1 + greaterHeight_ * HEIGHT_PER_LEVEL);
+		dd.setHeightMod(1 + greaterHeight_ * HEIGHT_PER_LEVEL);
 
 		// Rebuff chance
 		dd.setRebuffChance1(REBUFF_CHANCE_PER_LEVEL * rebuff_);
 		dd.setRebuffChance2(REBUFF_CHANCE_PER_LEVEL
-				* Math.max(rebuff_ - REBUFF_2_LEVEL, 0));
+				* Math.max(rebuff_ - REBUFF_2_LEVEL + 1, 0));
 		dd.setRebuffChance3(REBUFF_CHANCE_PER_LEVEL
-				* Math.max(rebuff_ - REBUFF_3_LEVEL, 0));
+				* Math.max(rebuff_ - REBUFF_3_LEVEL + 1, 0));
 
 		// Reposition
 		if (reposition_ >= REPOSITION_4_LEVEL) {
@@ -170,13 +172,13 @@ public class AttackAttributes {
 		dd.setStealChance1(STEAL_CHANCE_1 * steal_);
 		dd
 				.setStealChance2(STEAL_CHANCE_2
-						* Math.max(steal_ - STEAL_2_LEVEL, 0));
+						* Math.max(steal_ - STEAL_2_LEVEL + 1, 0));
 		dd
 				.setStealChance3(STEAL_CHANCE_3
-						* Math.max(steal_ - STEAL_3_LEVEL, 0));
+						* Math.max(steal_ - STEAL_3_LEVEL + 1, 0));
 		dd
 				.setStealChance4(STEAL_CHANCE_4
-						* Math.max(steal_ - STEAL_4_LEVEL, 0));
+						* Math.max(steal_ - STEAL_4_LEVEL + 1, 0));
 
 		// Poison
 		Random random = new Random();
@@ -314,6 +316,15 @@ public class AttackAttributes {
 		}
 		return true;
 	}
+	
+	/**
+	 * Sets the range level.
+	 * 
+	 * @param index The index chosen.
+	 */
+	public void setRangeIndex(int index) {
+		rangeLevelIndex_ = index;
+	}
 
 	/**
 	 * Increments the level of an attribute unless it is at max.
@@ -392,5 +403,65 @@ public class AttackAttributes {
 			break;
 		}
 		return false;
+	}
+	
+	/**
+	 * Gets the range points for an attack at a set level and index, if
+	 * necessary. This method assumes the soldier is facing north (point (0,1))
+	 * is the default attack.
+	 * 
+	 * @param type
+	 *            The attack type.
+	 * @param level
+	 *            The level of range, between 0 and 5.
+	 * @param levelIndex
+	 *            The index of the range, either 0, 1, or 2 (both).
+	 * @param modifierPerLevel
+	 *            The amount the modifier increases with level.
+	 * @return A collection of points with their damage modifiers.
+	 */
+	public static Collection<Pair<Point, Float>> getRangedPoints(
+			AttackType type, int level, int levelIndex, float modifierPerLevel) {
+		Collection<Pair<Point, Float>> rangedPoints = new HashSet<Pair<Point, Float>>();
+
+		// Each ranged point has the immediate point (0)
+		rangedPoints.add(new Pair<Point, Float>(new Point(0, 1), 1f));
+
+		// Next attack points depend on the attack type and the level (and
+		// index).
+		Point[] attackPoints = type.getAttackPoints();
+		float modifier = modifierPerLevel;
+		for (; level > 0; level--) {
+			addPoints(levelIndex, rangedPoints, modifier,
+					attackPoints[level * 2 - 2], attackPoints[level * 2 - 1]);
+			modifier += modifierPerLevel;
+			levelIndex = 2;
+		}
+
+		return rangedPoints;
+	}
+
+	/**
+	 * Adds a point or points to the range points with an appropriate modifier,
+	 * and increases the modifier for the next lower level.
+	 * 
+	 * @param levelIndex
+	 *            The level index of the current level.
+	 * @param rangePoints
+	 *            The set of points being added to.
+	 * @param modifier
+	 *            The modifier to add the point/s at.
+	 * @param point1
+	 *            Index 0 of the points.
+	 * @param point2
+	 *            Index 1 of the points.
+	 * @return The new modifier.
+	 */
+	private static void addPoints(int levelIndex, Collection<Pair<Point, Float>> rangePoints,
+			float modifier, Point point1, Point point2) {
+		if ((levelIndex == 0) || (levelIndex == 2))
+			rangePoints.add(new Pair<Point, Float>(point1, modifier));
+		if ((levelIndex == 1) || (levelIndex == 2))
+			rangePoints.add(new Pair<Point, Float>(point2, modifier));
 	}
 }

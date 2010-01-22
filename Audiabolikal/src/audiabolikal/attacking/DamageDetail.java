@@ -138,7 +138,7 @@ public class DamageDetail {
 		this.rebuffChance3_ = rebuffChance3;
 	}
 
-	public float getRepositionMove() {
+	public int getRepositionMove() {
 		return repositionMove_;
 	}
 
