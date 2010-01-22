@@ -20,4 +20,8 @@ public abstract class Weapon extends Item {
 	/** The animation for a thrusting attack. */
 	
 	/** The animation for a magic shot attack. */
+	
+	public Weapon() {
+		className_ = "Weapon";
+	}
 }

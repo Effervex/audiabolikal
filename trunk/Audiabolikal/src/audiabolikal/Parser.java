@@ -9,6 +9,7 @@ import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
+import audiabolikal.attacking.Attack;
 import audiabolikal.util.ProbabilityDistribution;
 
 import net.roarsoftware.lastfm.*;
@@ -19,10 +20,10 @@ import net.roarsoftware.lastfm.*;
  */
 public class Parser {
 	/** The API key. */
-	private static final String API_KEY = "58d47844ca662d856abf022d06802b4a";
+	public static final String API_KEY = "58d47844ca662d856abf022d06802b4a";
 
 	/** The API secret. */
-	private static final String API_SECRET = "bf32b33d30ce07ea0776a8f18cdfb208";
+	public static final String API_SECRET = "bf32b33d30ce07ea0776a8f18cdfb208";
 
 	/** The number of tags to use for generation. */
 	public static final int NUM_TAGS = 3;
@@ -78,7 +79,6 @@ public class Parser {
 	 * @return An attack, created from the data within the file.
 	 */
 	public static Attack parseAttack(AudioFile songFile) {
-		
 		return null;
 	}
 }

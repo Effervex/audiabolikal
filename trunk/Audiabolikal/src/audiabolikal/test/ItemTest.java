@@ -45,11 +45,40 @@ public class ItemTest {
 			assertEquals(unique.getLevel(), 1, 0);
 			System.out.println();
 		}
+		
+		System.out.println("Increasing levels with variance");
+		for (int i = 1; i <= 100; i += 5) {
+			Item unique = item.spawnIndividualItem(i, false);
+			System.out.println(unique);
+			System.out.println();
+		}
 	}
 	
 	@Test
 	public void testApplyLevel() {
-		fail("Not yet implemented");
+		// Base levelling
+		float result = Item.applyLevel(1, 10, 10, 0);
+		assertEquals(result, 11);
+		result = Item.applyLevel(5, 10, 10, 0);
+		assertEquals(result, 15);
+		
+		// Variance levelling
+		result = Item.applyLevel(1, 10, 12, 2);
+		assertEquals(result, 11.3);
+		result = Item.applyLevel(5, 10, 12, 2);
+		assertEquals(result, 16.5);
+		
+		// Negative
+		result = Item.applyLevel(1, 10, 7, -3);
+		assertEquals(result, 10.55);
+		result = Item.applyLevel(5, 10, 7, -3);
+		assertEquals(result, 12.75);
+		
+		// Minimum levelling
+		result = Item.applyLevel(1, 10, 4, -6);
+		assertEquals(result, 10.2);
+		result = Item.applyLevel(1, 0, 0, 0);
+		assertEquals(result, 0.2);
 	}
 
 	@Test

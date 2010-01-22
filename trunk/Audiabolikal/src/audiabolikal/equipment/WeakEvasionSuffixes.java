@@ -1,7 +1,6 @@
 package audiabolikal.equipment;
 
 /**
- * TODO
  * An ordered enumeration (from average to worst) of weak prefix words.
  * 
  * @author Samuel J. Sarjant

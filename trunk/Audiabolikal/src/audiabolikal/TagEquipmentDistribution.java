@@ -64,11 +64,11 @@ public class TagEquipmentDistribution {
 
 				// Get/create the particular item distribution
 				ProbabilityDistribution<Item> distro = equipmentDistro.get(item
-						.getClass().getSimpleName());
+						.getClassName());
 				if (distro == null) {
 					distro = new ProbabilityDistribution<Item>();
 					equipmentDistro
-							.put(item.getClass().getSimpleName(), distro);
+							.put(item.getClassName(), distro);
 				}
 
 				// If for a child, modify the weight based on relationship
