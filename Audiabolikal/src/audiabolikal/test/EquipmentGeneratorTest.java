@@ -78,27 +78,45 @@ public class EquipmentGeneratorTest {
 	@Test
 	public void testGenerateAura() {
 		// Basic test
-		Face face = sut_.generateFace("metal");
-		assertNotNull(face);
-		assertEquals(face.getName(), "angry");
-		face = sut_.generateFace("thrash metal");
-		assertNotNull(face);
-		assertEquals(face.getName(), "angry");
+		Aura aura = sut_.generateAura("metal");
+		assertNotNull(aura);
+		assertEquals(aura.getName(), "ki");
+		aura = sut_.generateAura("thrash metal");
+		assertNotNull(aura);
+		assertEquals(aura.getName(), "ki");
 	}
 
 	@Test
 	public void testGenerateAttire() {
-		fail("Not yet implemented");
+		// Basic test
+		Attire attire = sut_.generateAttire("rock");
+		assertNotNull(attire);
+		assertEquals(attire.getName(), "suit");
+		attire = sut_.generateAttire("hard rock");
+		assertNotNull(attire);
+		assertEquals(attire.getName(), "suit");
 	}
 
 	@Test
 	public void testGenerateFootwear() {
-		fail("Not yet implemented");
+		// Basic test
+		Footwear footwear = sut_.generateFootwear("rock");
+		assertNotNull(footwear);
+		assertEquals(footwear.getName(), "sandals");
+		footwear = sut_.generateFootwear("hard rock");
+		assertNotNull(footwear);
+		assertEquals(footwear.getName(), "sandals");
 	}
 
 	@Test
 	public void testGenerateWeapon() {
-		fail("Not yet implemented");
+		// Basic test
+		Weapon weapon = sut_.generateWeapon("rock");
+		assertNotNull(weapon);
+		assertEquals(weapon.getName(), "axe");
+		weapon = sut_.generateWeapon("hard rock");
+		assertNotNull(weapon);
+		assertEquals(weapon.getName(), "axe");
 	}
 
 }

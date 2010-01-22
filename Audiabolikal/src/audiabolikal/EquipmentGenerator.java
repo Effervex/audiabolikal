@@ -116,7 +116,7 @@ public class EquipmentGenerator {
 	 * @return Weapon for that tag, or null if tag doesn't exist/has no items.
 	 */
 	public Weapon generateWeapon(String tag) {
-		return (Weapon) generateItem(tag, Weapon.class.getSimpleName());
+		return (Weapon) generateItem(tag, "Weapon");
 	}
 
 	/**
