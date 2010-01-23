@@ -61,6 +61,11 @@ public abstract class Item {
 	/** The random number generator for the mould. */
 	private Random random_;
 
+	/*
+	 * TODO Build a quick swing app capable of displaying textured models.
+	 * Within this model, include value boxes for each attribute and counts of
+	 * total values and counts of total attributes over the entire item set.
+	 */
 	/** The mesh for male models representing this item. */
 
 	/** The mesh for female models representing this item. */

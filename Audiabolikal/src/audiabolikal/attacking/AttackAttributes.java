@@ -84,6 +84,17 @@ public class AttackAttributes {
 	/** Slow level. */
 	private int slow_;
 
+	/** The type of attack this attack attribute is. */
+	private AttackType attackType_;
+
+	/** The attack points of the attack. */
+	private Map<Point, DamageDetail> attackPoints_;
+
+	public AttackAttributes(AttackType type) {
+		attackType_ = type;
+		updateAttackDetails();
+	}
+
 	/**
 	 * Gets the details of this attack, using the attributes to form a mapping
 	 * of damage details.
@@ -91,19 +102,10 @@ public class AttackAttributes {
 	 * @return A mapping of points which are under the attack range, assuming
 	 *         they fit the height requirements.
 	 */
-	public Map<Point, DamageDetail> getAttackDetails(AttackType type,
-			Point soldierDirection) {
-		// TODO Store the computed information and update when levelled up.
-		Map<Point, DamageDetail> attackPoints = new HashMap<Point, DamageDetail>();
-
-		int rangeLevel = (greaterRange_ + 1) / 2;
-		int rangeIndex = 2;
-		// Odd level
-		if ((greaterRange_ & 1) != 0) {
-			rangeIndex = rangeLevelIndex_;
+	public Map<Point, DamageDetail> getAttackDetails(Point soldierDirection) {
+		if (attackPoints_ == null) {
+			updateAttackDetails();
 		}
-		Collection<Pair<Point, Float>> rawPoints = getRangedPoints(
-				type, rangeLevel, rangeIndex, RANGE_DAMAGE_PER_LEVEL);
 
 		// Calculate the rotation
 		double rotation = 0;
@@ -114,6 +116,37 @@ public class AttackAttributes {
 		else if (soldierDirection.x == 1)
 			rotation = Math.PI * 1.5;
 
+		// Apply rotation
+		Map<Point, DamageDetail> rotatedPoints = attackPoints_;
+		if (rotation != 0) {
+			rotatedPoints = new HashMap<Point, DamageDetail>();
+			for (Point point : attackPoints_.keySet()) {
+				Point point2 = new Point((int) Math.round(Math.cos(rotation)
+						* point.x - Math.sin(rotation) * point.y), (int) Math
+						.round(Math.sin(rotation) * point.x
+								+ Math.cos(rotation) * point.y));
+				rotatedPoints.put(point2, attackPoints_.get(point));
+			}
+		}
+
+		return rotatedPoints;
+	}
+
+	/**
+	 * Updates the attack attributes.
+	 */
+	private void updateAttackDetails() {
+		attackPoints_ = new HashMap<Point, DamageDetail>();
+
+		int rangeLevel = (greaterRange_ + 1) / 2;
+		int rangeIndex = 2;
+		// Odd level
+		if ((greaterRange_ & 1) != 0) {
+			rangeIndex = rangeLevelIndex_;
+		}
+		Collection<Pair<Point, Float>> rawPoints = getRangedPoints(attackType_,
+				rangeLevel, rangeIndex, RANGE_DAMAGE_PER_LEVEL);
+
 		DamageDetail unmodifiedDD = createBaseDD();
 
 		// For each point, apply the modifier and add it.
@@ -121,18 +154,8 @@ public class AttackAttributes {
 			DamageDetail dd = unmodifiedDD.clone();
 			dd.applyModifier(point.getB());
 
-			// Rotate the point
-			Point point2 = point.getA();
-			if (rotation != 0) {
-				point2 = new Point((int) Math.round(Math.cos(rotation) * point2.x
-						- Math.sin(rotation) * point2.y), (int) Math.round(Math.sin(rotation)
-						* point2.x + Math.cos(rotation) * point2.y));
-			}
-			
-			attackPoints.put(point2, dd);
+			attackPoints_.put(point.getA(), dd);
 		}
-
-		return attackPoints;
 	}
 
 	/**
@@ -170,15 +193,12 @@ public class AttackAttributes {
 
 		// Steal
 		dd.setStealChance1(STEAL_CHANCE_1 * steal_);
-		dd
-				.setStealChance2(STEAL_CHANCE_2
-						* Math.max(steal_ - STEAL_2_LEVEL + 1, 0));
-		dd
-				.setStealChance3(STEAL_CHANCE_3
-						* Math.max(steal_ - STEAL_3_LEVEL + 1, 0));
-		dd
-				.setStealChance4(STEAL_CHANCE_4
-						* Math.max(steal_ - STEAL_4_LEVEL + 1, 0));
+		dd.setStealChance2(STEAL_CHANCE_2
+				* Math.max(steal_ - STEAL_2_LEVEL + 1, 0));
+		dd.setStealChance3(STEAL_CHANCE_3
+				* Math.max(steal_ - STEAL_3_LEVEL + 1, 0));
+		dd.setStealChance4(STEAL_CHANCE_4
+				* Math.max(steal_ - STEAL_4_LEVEL + 1, 0));
 
 		// Poison
 		Random random = new Random();
@@ -222,8 +242,11 @@ public class AttackAttributes {
 		// Level * LEVELLING_COEFICIENT + Level-1 * LEVELLING_COEFFICIENT +
 		// Level-2 * ...
 		int aaCurrentLevel = lookupLevel(aa);
-		if (aaCurrentLevel == MAX_ATTRIBUTE_LEVEL)
+		if (aaCurrentLevel >= MAX_ATTRIBUTE_LEVEL)
 			return -1;
+
+		// Needs to be incremented for the formula to work
+		aaCurrentLevel++;
 
 		return LEVELLING_COEFFICIENT * aaCurrentLevel * (aaCurrentLevel + 1)
 				/ 2;
@@ -314,16 +337,29 @@ public class AttackAttributes {
 		default:
 			return false;
 		}
+
+		updateAttackDetails();
 		return true;
 	}
-	
+
 	/**
 	 * Sets the range level.
 	 * 
-	 * @param index The index chosen.
+	 * @param index
+	 *            The index chosen.
 	 */
 	public void setRangeIndex(int index) {
 		rangeLevelIndex_ = index;
+		updateAttackDetails();
+	}
+
+	/**
+	 * Gets the range index.
+	 * 
+	 * @return The range index.
+	 */
+	public int getRangeIndex() {
+		return rangeLevelIndex_;
 	}
 
 	/**
@@ -338,73 +374,84 @@ public class AttackAttributes {
 		case GREATER_DAMAGE:
 			if (greaterDamage_ < MAX_ATTRIBUTE_LEVEL) {
 				greaterDamage_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		case GREATER_RANGE:
 			if (greaterRange_ < MAX_ATTRIBUTE_LEVEL) {
 				greaterRange_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		case GREATER_HEIGHT:
 			if (greaterHeight_ < MAX_ATTRIBUTE_LEVEL) {
 				greaterHeight_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		case REBUFF:
 			if (rebuff_ < MAX_ATTRIBUTE_LEVEL) {
 				rebuff_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		case REPOSITION:
 			if (reposition_ < MAX_ATTRIBUTE_LEVEL) {
 				reposition_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		case STEAL:
 			if (steal_ < MAX_ATTRIBUTE_LEVEL) {
 				steal_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		case POISON:
 			if (poison_ < MAX_ATTRIBUTE_LEVEL) {
 				poison_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		case WEAKEN:
 			if (weaken_ < MAX_ATTRIBUTE_LEVEL) {
 				weaken_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		case CORRODE:
 			if (corrode_ < MAX_ATTRIBUTE_LEVEL) {
 				corrode_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		case BLEAR:
 			if (blear_ < MAX_ATTRIBUTE_LEVEL) {
 				blear_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		case SLOW:
 			if (slow_ < MAX_ATTRIBUTE_LEVEL) {
 				slow_++;
+				updateAttackDetails();
 				return true;
 			}
 			break;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Gets the range points for an attack at a set level and index, if
 	 * necessary. This method assumes the soldier is facing north (point (0,1))
@@ -426,6 +473,9 @@ public class AttackAttributes {
 
 		// Each ranged point has the immediate point (0)
 		rangedPoints.add(new Pair<Point, Float>(new Point(0, 1), 1f));
+
+		if (type.equals(AttackType.NORMAL))
+			return rangedPoints;
 
 		// Next attack points depend on the attack type and the level (and
 		// index).
@@ -457,11 +507,46 @@ public class AttackAttributes {
 	 *            Index 1 of the points.
 	 * @return The new modifier.
 	 */
-	private static void addPoints(int levelIndex, Collection<Pair<Point, Float>> rangePoints,
-			float modifier, Point point1, Point point2) {
+	private static void addPoints(int levelIndex,
+			Collection<Pair<Point, Float>> rangePoints, float modifier,
+			Point point1, Point point2) {
 		if ((levelIndex == 0) || (levelIndex == 2))
 			rangePoints.add(new Pair<Point, Float>(point1, modifier));
 		if ((levelIndex == 1) || (levelIndex == 2))
 			rangePoints.add(new Pair<Point, Float>(point2, modifier));
+	}
+
+	/**
+	 * Gets the level of the attribute.
+	 * 
+	 * @param attribute
+	 * @return The level of the attribute.
+	 */
+	public Object getLevel(AttackAttributeEnum attribute) {
+		switch (attribute) {
+		case GREATER_DAMAGE:
+			return greaterDamage_;
+		case GREATER_RANGE:
+			return greaterRange_;
+		case GREATER_HEIGHT:
+			return greaterHeight_;
+		case REBUFF:
+			return rebuff_;
+		case REPOSITION:
+			return reposition_;
+		case STEAL:
+			return steal_;
+		case POISON:
+			return poison_;
+		case WEAKEN:
+			return weaken_;
+		case CORRODE:
+			return corrode_;
+		case BLEAR:
+			return blear_;
+		case SLOW:
+			return slow_;
+		}
+		return -1;
 	}
 }
