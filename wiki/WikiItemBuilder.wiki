@@ -26,6 +26,7 @@ Second third
  * Genres lists the genres associated with the item and their weights (0.1-1). More genres can be added from a set list of genres by clicking 'Add genres.'
  * Colours lists the colours associated with the item and their weights(0.1-1). More colours can be added from a palette by clicking 'Add colours.'
  * Mesh and texture define the file where the mest and texture are stored.
+ * *Next to the mesh and texture fields have 'Browse...' buttons.*
  * *Include rotation and scale values for the mesh and texture (e.g. cap, cap worn backwards, etc)*
  * *Include 'Apply' and 'Cancel' buttons so the updates between details and list of items are less frequent.*
 
