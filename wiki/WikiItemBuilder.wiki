@@ -16,6 +16,7 @@ First third
  * The list of all items. Items can be selected and their details will be shown in the other two parts of the screen.
  * The Total labels list the total ATK, DEF, HIT and EVA of the items in the list. Also shows their combined variances.
  * Uncovered Genres shows a list of genres not covered by the list of items. Ideally, for each type of item, they should cover all genres.
+ * *Need include buttons for adding and removing items*
 
 Second third
  * The base name of the item.
