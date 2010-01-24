@@ -1,0 +1,34 @@
+#summary ItemBuilder is a tool for creating items.
+
+= Introduction =
+
+To quickly and effectively create balanced items tagged with genres, colours and attributes, the ItemBuilder tool is used. ItemBuilder is a swing app capable of displaying the item model and all relevant attributes of the item, along with global observations over the items.
+
+
+= Details =
+
+A basic sketch-up of the ItemBuilder:
+
+[http://i46.tinypic.com/2dj4hp1.jpg]
+
+First third
+ * The drop box on the top-left corner sorts which types of items. Beside it is a box filtering results with vale mods less than or equal to a value.
+ * The list of all items. Items can be selected and their details will be shown in the other two parts of the screen.
+ * The Total* labels list the total ATK, DEF, HIT and EVA of the items in the list. Also shows their combined variances.
+ * Uncovered Genres shows a list of genres not covered by the list of items. Ideally, for each type of item, they should cover all genres.
+
+Second third
+ * The base name of the item.
+ * The attributes and variances. Total Attributes details the unallocated points for the attributes, where each item should use an average of X points.
+ * Value mod is the value modifier. Essentially, value mod is the rarity of the item. Average value simply applies the value mod to the current attributes.
+ * Genres lists the genres associated with the item and their weights (0.1-1). More genres can be added from a set list of genres by clicking 'Add genres.'
+ * Colours lists the colours associated with the item and their weights(0.1-1). More colours can be added from a palette by clicking 'Add colours.'
+ * Mesh and texture define the file where the mest and texture are stored.
+
+Third third
+ * The 3d textured and coloured model of the item.
+ * If manually adjust is unselected, the model spins about the Y-axis at a constant speed. Else the user can adjust the model position.
+ * If choose colour is unselected, the model cycles through the colours of the item. Else the user can select the colour.
+ * Zoom adjusts the level of zoom on the item.
+
+The builder will also need a menu bar for loading and saving item files.
