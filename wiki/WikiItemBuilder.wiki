@@ -27,6 +27,7 @@ Second third
  * Colours lists the colours associated with the item and their weights(0.1-1). More colours can be added from a palette by clicking 'Add colours.'
  * Mesh and texture define the file where the mest and texture are stored.
  * *Include rotation and scale values for the mesh and texture (e.g. cap, cap worn backwards, etc)*
+ * *Include 'Apply' and 'Cancel' buttons so the updates between details and list of items are less frequent.*
 
 Third third
  * The 3d textured and coloured model of the item.
