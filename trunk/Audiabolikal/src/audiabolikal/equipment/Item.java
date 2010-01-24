@@ -21,7 +21,7 @@ public abstract class Item {
 
 	/**
 	 * The maximum SD value. This value results in the best/worst possibility
-	 * being chosen at 1/500.
+	 * being chosen at ~1/500.
 	 */
 	private static final double MAX_SD = 2.23;
 
@@ -61,11 +61,6 @@ public abstract class Item {
 	/** The random number generator for the mould. */
 	private Random random_;
 
-	/*
-	 * TODO Build a quick swing app capable of displaying textured models.
-	 * Within this model, include value boxes for each attribute and counts of
-	 * total values and counts of total attributes over the entire item set.
-	 */
 	/** The mesh for male models representing this item. */
 
 	/** The mesh for female models representing this item. */
@@ -451,6 +446,87 @@ public abstract class Item {
 	 */
 	public int getValue() {
 		return value_;
+	}
+	
+	/**
+	 * Gets the base attack.
+	 * 
+	 * @return The base attack.
+	 */
+	public float getBaseAttack() {
+		return baseAttack_;
+	}
+	
+	/**
+	 * Gets the base defense.
+	 * 
+	 * @return The base defense.
+	 */
+	public float getBaseDefense() {
+		return baseDefense_;
+	}
+	
+	/**
+	 * Gets the base hit.
+	 * 
+	 * @return The base hit.
+	 */
+	public float getBaseHit() {
+		return baseHit_;
+	}
+	
+	/**
+	 * Gets the base evasion.
+	 * 
+	 * @return The base evasion.
+	 */
+	public float getBaseEvasion() {
+		return baseAttack_;
+	}
+	
+	/**
+	 * Gets the attack variance.
+	 * 
+	 * @return The attack variance.
+	 */
+	public float getAttackVariance() {
+		return attackVariance_;
+	}
+	
+	/**
+	 * Gets the defense variance.
+	 * 
+	 * @return The defense variance.
+	 */
+	public float getDefenseVariance() {
+		return defenseVariance_;
+	}
+	
+	/**
+	 * Gets the hit variance.
+	 * 
+	 * @return The hit variance.
+	 */
+	public float getHitVariance() {
+		return hitVariance_;
+	}
+	
+	/**
+	 * Gets the evasion variance.
+	 * 
+	 * @return The evasion variance.
+	 */
+	public float getEvasionVariance() {
+		return evasionVariance_;
+	}
+
+	/**
+	 * Gets the value mod for this item.
+	 * 
+	 * @return The value mod.
+	 */
+	public float getValueMod() {
+		return baseValue_;
 	}
 
 	/**

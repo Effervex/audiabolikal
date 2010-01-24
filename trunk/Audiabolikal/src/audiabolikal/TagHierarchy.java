@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,9 +30,12 @@ public class TagHierarchy {
 
 	/**
 	 * The inverse of the tag relations, denoting which non-leaf tags are
-	 * parents of other tags, for efficient looup.
+	 * parents of other tags, for efficient loop checking.
 	 */
 	private MultiMap<String, String> childMap_;
+	
+	/** The set of all tags seen. */
+	private Set<String> tags_;
 
 	/** The roots of the hierarchy (no parents). */
 	private Set<String> roots_;
@@ -54,6 +58,7 @@ public class TagHierarchy {
 	 */
 	private void initialise(File tagFile) {
 		MultiMap<String, WeightedRelation> tuples = new MultiMap<String, WeightedRelation>();
+		tags_ = new HashSet<String>();
 
 		try {
 			FileReader reader = new FileReader(tagFile);
@@ -67,6 +72,8 @@ public class TagHierarchy {
 				for (int i = 0; i < split.length; i++) {
 					split[i] = split[i].replaceAll("\"", "");
 				}
+				tags_.add(split[0]);
+				tags_.add(split[1]);
 
 				// Check if the key already exists, and overwrite it if better
 				WeightedRelation wr = new WeightedRelation(split[1], Float
@@ -278,6 +285,15 @@ public class TagHierarchy {
 				return parents.get(index).getWeight();
 		}
 		return 0;
+	}
+
+	/**
+	 * Gets every tag seen in the hierarchy.
+	 * 
+	 * @return Every tag in the hierarchy.
+	 */
+	public Collection<String> getTags() {
+		return tags_;
 	}
 
 	/**

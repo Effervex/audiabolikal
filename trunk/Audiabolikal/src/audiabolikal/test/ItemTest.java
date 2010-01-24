@@ -58,27 +58,27 @@ public class ItemTest {
 	public void testApplyLevel() {
 		// Base levelling
 		float result = Item.applyLevel(1, 10, 10, 0);
-		assertEquals(result, 11);
+		assertEquals(result, 11, 0.001);
 		result = Item.applyLevel(5, 10, 10, 0);
-		assertEquals(result, 15);
+		assertEquals(result, 15, 0.001);
 		
 		// Variance levelling
 		result = Item.applyLevel(1, 10, 12, 2);
-		assertEquals(result, 11.3);
+		assertEquals(result, 11.3, 0.001);
 		result = Item.applyLevel(5, 10, 12, 2);
-		assertEquals(result, 16.5);
+		assertEquals(result, 16.5, 0.001);
 		
 		// Negative
 		result = Item.applyLevel(1, 10, 7, -3);
-		assertEquals(result, 10.55);
+		assertEquals(result, 10.55, 0.001);
 		result = Item.applyLevel(5, 10, 7, -3);
-		assertEquals(result, 12.75);
+		assertEquals(result, 12.75, 0.001);
 		
 		// Minimum levelling
 		result = Item.applyLevel(1, 10, 4, -6);
-		assertEquals(result, 10.2);
+		assertEquals(result, 10.2, 0.001);
 		result = Item.applyLevel(1, 0, 0, 0);
-		assertEquals(result, 0.2);
+		assertEquals(result, 0.2, 0.001);
 	}
 
 	@Test
