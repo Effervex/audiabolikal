@@ -19,6 +19,7 @@ First third
  * *Need include buttons for adding and removing items*
 
 Second third
+ * *Include the item type as a combo box*
  * The base name of the item.
  * The attributes and variances. Total Attributes details the unallocated points for the attributes, where each item should use an average of X points.
  * Value mod is the value modifier. Essentially, value mod is the rarity of the item. Average value simply applies the value mod to the current attributes.
