@@ -14,7 +14,7 @@ A basic sketch-up of the ItemBuilder:
 First third
  * The drop box on the top-left corner sorts which types of items. Beside it is a box filtering results with vale mods less than or equal to a value.
  * The list of all items. Items can be selected and their details will be shown in the other two parts of the screen.
- * The Total* labels list the total ATK, DEF, HIT and EVA of the items in the list. Also shows their combined variances.
+ * The Total labels list the total ATK, DEF, HIT and EVA of the items in the list. Also shows their combined variances.
  * Uncovered Genres shows a list of genres not covered by the list of items. Ideally, for each type of item, they should cover all genres.
 
 Second third
