@@ -1,6 +1,7 @@
 package audiabolikal.equipment;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -114,26 +115,35 @@ public abstract class Item {
 	 *            values.
 	 * @param baseAttack
 	 *            The base attack for the item.
-	 * @param attackVariance
-	 *            The amount of variance the attack can have.
-	 * @param baseDefense
-	 *            The base defense of the item.
-	 * @param defenseVariance
-	 *            The amount of variance the defense can have.
 	 * @param baseAttack
 	 *            The base hit for the item.
 	 * @param attackVariance
+	 *            The amount of variance the attack can have.
+	 * @param attackVariance
 	 *            The amount of variance the hit can have.
+	 * @param baseDefense
+	 *            The base defense of the item.
 	 * @param baseDefense
 	 *            The base evasion of the item.
 	 * @param defenseVariance
+	 *            The amount of variance the defense can have.
+	 * @param defenseVariance
 	 *            The amount of variance the evasion can have.
+	 * @param maleMeshFile
+	 *            The mesh file for the male model.
+	 * @param femaleMeshFile
+	 *            The mesh file for the female model.
+	 * @param maleTextureFile
+	 *            The texture file for the male model.
+	 * @param femaleTexttureFile
+	 *            The texture file for the female model.
 	 */
 	public void initialiseMouldItem(String name, Map<String, Double> genres,
-			ProbabilityDistribution<Color> itemColors, int valueMod,
+			ProbabilityDistribution<Color> itemColors, float valueMod,
 			float baseAttack, float attackVariance, float baseDefense,
 			float defenseVariance, float baseHit, float hitVariance,
-			float baseEvasion, float evasionVariance) {
+			float baseEvasion, float evasionVariance, File maleMeshFile,
+			File femaleMeshFile, File maleTextureFile, File femaleTextureFile) {
 		individual_ = false;
 		name_ = name;
 		genres_ = genres;
@@ -148,6 +158,33 @@ public abstract class Item {
 		hitVariance_ = hitVariance;
 		evasionVariance_ = evasionVariance;
 		random_ = new Random();
+	}
+
+	/**
+	 * A shortened constructor.
+	 * 
+	 * @param name
+	 *            The name of the item.
+	 * @param genres
+	 *            The genres the item covers.
+	 * @param itemColors
+	 *            The possible colours the item can be.
+	 * @param valueMod
+	 *            The value modifier of the item. Relates to attack and defense
+	 *            values.
+	 * @param attributes
+	 *            The attributes in 8 index array form: attribute, variance.
+	 *            ATK, DEF, HIT, EVA.
+	 * @param modelFiles
+	 *            The files for the item models.
+	 */
+	public void initialiseMouldItem(String name, Map<String, Double> genres,
+			ProbabilityDistribution<Color> itemColors, float valueMod,
+			float[] attributes, File[] modelFiles) {
+		initialiseMouldItem(name, genres, itemColors, valueMod, attributes[0],
+				attributes[1], attributes[2], attributes[3], attributes[4],
+				attributes[5], attributes[6], attributes[7], modelFiles[0],
+				modelFiles[1], modelFiles[2], modelFiles[3]);
 	}
 
 	/**
@@ -447,7 +484,7 @@ public abstract class Item {
 	public int getValue() {
 		return value_;
 	}
-	
+
 	/**
 	 * Gets the base attack.
 	 * 
@@ -456,7 +493,7 @@ public abstract class Item {
 	public float getBaseAttack() {
 		return baseAttack_;
 	}
-	
+
 	/**
 	 * Gets the base defense.
 	 * 
@@ -465,7 +502,7 @@ public abstract class Item {
 	public float getBaseDefense() {
 		return baseDefense_;
 	}
-	
+
 	/**
 	 * Gets the base hit.
 	 * 
@@ -474,7 +511,7 @@ public abstract class Item {
 	public float getBaseHit() {
 		return baseHit_;
 	}
-	
+
 	/**
 	 * Gets the base evasion.
 	 * 
@@ -483,7 +520,7 @@ public abstract class Item {
 	public float getBaseEvasion() {
 		return baseAttack_;
 	}
-	
+
 	/**
 	 * Gets the attack variance.
 	 * 
@@ -492,7 +529,7 @@ public abstract class Item {
 	public float getAttackVariance() {
 		return attackVariance_;
 	}
-	
+
 	/**
 	 * Gets the defense variance.
 	 * 
@@ -501,7 +538,7 @@ public abstract class Item {
 	public float getDefenseVariance() {
 		return defenseVariance_;
 	}
-	
+
 	/**
 	 * Gets the hit variance.
 	 * 
@@ -510,7 +547,7 @@ public abstract class Item {
 	public float getHitVariance() {
 		return hitVariance_;
 	}
-	
+
 	/**
 	 * Gets the evasion variance.
 	 * 
