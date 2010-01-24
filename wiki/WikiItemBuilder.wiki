@@ -1,13 +1,13 @@
-#summary ItemBuilder is a tool for creating items.
+#summary Item Builder is a tool for creating items.
 
 = Introduction =
 
-To quickly and effectively create balanced items tagged with genres, colours and attributes, the ItemBuilder tool is used. ItemBuilder is a swing app capable of displaying the item model and all relevant attributes of the item, along with global observations over the items.
+To quickly and effectively create balanced items tagged with genres, colours and attributes, the Item Builder tool is used. Item Builder is a swing app capable of displaying the item model and all relevant attributes of the item, along with global observations over the items.
 
 
 = Details =
 
-A basic sketch-up of the ItemBuilder:
+A basic sketch-up of the Item Builder:
 
 [http://i46.tinypic.com/2dj4hp1.jpg]
 
@@ -25,6 +25,7 @@ Second third
  * Genres lists the genres associated with the item and their weights (0.1-1). More genres can be added from a set list of genres by clicking 'Add genres.'
  * Colours lists the colours associated with the item and their weights(0.1-1). More colours can be added from a palette by clicking 'Add colours.'
  * Mesh and texture define the file where the mest and texture are stored.
+ * *Include rotation and scale values for the mesh and texture (e.g. cap, cap worn backwards, etc)*
 
 Third third
  * The 3d textured and coloured model of the item.
