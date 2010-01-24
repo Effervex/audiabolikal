@@ -4,7 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,15 +19,15 @@ import javax.swing.JTextField;
  */
 public class ItemBuilder extends JFrame {
 	public static final int GAP_SIZE = 5;
-	private ItemsListPanel itemsList_;
-	private ItemDetailsPanel itemDetails_;
-	private ItemModelPanel itemModel_;
+	protected ItemsListPanel itemsList_;
+	protected ItemDetailsPanel itemDetails_;
+	protected ItemModelPanel itemModel_;
 
 	public ItemBuilder() {
 		initialise();
 		pack();
 		setVisible(true);
-		
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
@@ -64,5 +66,22 @@ public class ItemBuilder extends JFrame {
 		labelComp.add(new JLabel(componentLabel));
 		labelComp.add(component);
 		return labelComp;
+	}
+
+	/**
+	 * Creates a button linked to an action listener with the action command
+	 * equal to the button text.
+	 * 
+	 * @param buttonText
+	 *            The text of the button and the action command.
+	 * @param al
+	 *            The action listener.
+	 * @return The newly created button.
+	 */
+	public static JButton createButton(String buttonText, ActionListener al) {
+		JButton addItem = new JButton(buttonText);
+		addItem.setActionCommand(buttonText);
+		addItem.addActionListener(al);
+		return addItem;
 	}
 }

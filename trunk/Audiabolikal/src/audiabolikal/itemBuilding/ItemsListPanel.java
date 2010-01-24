@@ -2,14 +2,14 @@ package audiabolikal.itemBuilding;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -24,26 +24,32 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import audiabolikal.TagHierarchy;
+import audiabolikal.equipment.Headgear;
 import audiabolikal.equipment.Item;
+import audiabolikal.util.ProbabilityDistribution;
 
-public class ItemsListPanel extends JPanel {
+public class ItemsListPanel extends JPanel implements ActionListener,
+		ListSelectionListener {
 	private static final int NUM_ROWS_VISIBLE = 20;
-	private Frame parentFrame_;
+	private ItemBuilder parentFrame_;
 	private JComboBox itemTypeCom_;
-	private JTextField maxValueMod_;
+	private JTextField maxValueModFld_;
 	private JList itemsList_;
-	private JLabel totalATK_;
-	private JLabel totalDEF_;
-	private JLabel totalHIT_;
-	private JLabel totalEVA_;
+	private JLabel totalATKLbl_;
+	private JLabel totalDEFLbl_;
+	private JLabel totalHITLbl_;
+	private JLabel totalEVALbl_;
 
 	private Collection<Item> totalItems_;
 
-	public ItemsListPanel(Frame parent) {
+	public ItemsListPanel(ItemBuilder parent) {
 		parentFrame_ = parent;
 		totalItems_ = new TreeSet<Item>(new ListNameComparator<Item>());
 		initialise();
@@ -57,41 +63,52 @@ public class ItemsListPanel extends JPanel {
 		setBorder(BorderFactory.createEtchedBorder());
 
 		// Item combo box and value mod
-		String[] itemTypes = initialiseItemTypes();
+		String[] itemTypes = getItemTypes(true);
 		itemTypeCom_ = new JComboBox(itemTypes);
-		maxValueMod_ = new JTextField(8);
-		maxValueMod_.setText("-1");
+		maxValueModFld_ = new JTextField(8);
+		maxValueModFld_.setText("-1");
 		JPanel listSelector = new JPanel();
 		BorderLayout northLayout = new BorderLayout(ItemBuilder.GAP_SIZE,
 				ItemBuilder.GAP_SIZE);
 		listSelector.setLayout(northLayout);
 		listSelector.add(itemTypeCom_, BorderLayout.CENTER);
-		listSelector.add(ItemBuilder.createLabelledComponent(maxValueMod_,
+		listSelector.add(ItemBuilder.createLabelledComponent(maxValueModFld_,
 				"Value Mod <= "), BorderLayout.EAST);
 		add(listSelector, BorderLayout.NORTH);
 
 		// Adding the list
+		JPanel listPanel = new JPanel(new BorderLayout());
 		itemsList_ = new JList(new DefaultListModel());
 		itemsList_.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		itemsList_.setVisibleRowCount(NUM_ROWS_VISIBLE);
 		JScrollPane listScroll = new JScrollPane(itemsList_);
-		add(listScroll, BorderLayout.CENTER);
+		listPanel.add(listScroll, BorderLayout.CENTER);
+
+		JPanel buttonPanel = new JPanel();
+		JButton addItem = ItemBuilder.createButton("Add Item", this);
+		buttonPanel.add(addItem);
+		JButton removeItem = ItemBuilder.createButton("Remove Item", this);
+		buttonPanel.add(removeItem);
+		listPanel.add(buttonPanel, BorderLayout.SOUTH);
+		add(listPanel, BorderLayout.CENTER);
 
 		// Adding the statistics
 		JPanel statsPanel = new JPanel();
 		statsPanel.setBorder(BorderFactory.createTitledBorder("Statistics"));
 		BoxLayout downLayout = new BoxLayout(statsPanel, BoxLayout.Y_AXIS);
 		statsPanel.setLayout(downLayout);
-		totalATK_ = new JLabel("Total ATK:");
-		statsPanel.add(totalATK_);
-		totalDEF_ = new JLabel("Total DEF:");
-		statsPanel.add(totalDEF_);
-		totalHIT_ = new JLabel("Total HIT:");
-		statsPanel.add(totalHIT_);
-		totalEVA_ = new JLabel("Total EVA:");
-		statsPanel.add(totalEVA_);
-		JButton uncoveredGenres = new JButton("Uncovered Genres");
-		uncoveredGenres.addActionListener(new UncoveredGenresActionListener());
+		totalATKLbl_ = new JLabel("Total ATK:");
+		statsPanel.add(totalATKLbl_);
+		totalDEFLbl_ = new JLabel("Total DEF:");
+		statsPanel.add(totalDEFLbl_);
+		totalHITLbl_ = new JLabel("Total HIT:");
+		statsPanel.add(totalHITLbl_);
+		totalEVALbl_ = new JLabel("Total EVA:");
+		statsPanel.add(totalEVALbl_);
+		statsPanel.add(new JSeparator(JSeparator.HORIZONTAL));
+
+		JButton uncoveredGenres = ItemBuilder.createButton("Uncovered Genres",
+				this);
 		statsPanel.add(uncoveredGenres);
 		add(statsPanel, BorderLayout.SOUTH);
 
@@ -106,11 +123,10 @@ public class ItemsListPanel extends JPanel {
 		try {
 			// Get the type and clean of '-' chars
 			String typeString = (String) itemTypeCom_.getSelectedItem();
-			typeString = typeString.replaceAll("-", "");
 			Class typeClass = getCorrespondingClass(typeString);
 
 			// Get the max value mod
-			float maxValue = Float.parseFloat(maxValueMod_.getText());
+			float maxValue = Float.parseFloat(maxValueModFld_.getText());
 			if (maxValue == -1)
 				maxValue = Float.MAX_VALUE;
 
@@ -136,12 +152,12 @@ public class ItemsListPanel extends JPanel {
 					}
 				}
 			}
-			
+
 			// Update the statistics
-			totalATK_.setText(formStatString("ATK", totals[0], variances[0]));
-			totalDEF_.setText(formStatString("DEF", totals[1], variances[1]));
-			totalHIT_.setText(formStatString("HIT", totals[2], variances[2]));
-			totalEVA_.setText(formStatString("EVA", totals[3], variances[3]));
+			totalATKLbl_.setText(formStatString("ATK", totals[0], variances[0]));
+			totalDEFLbl_.setText(formStatString("DEF", totals[1], variances[1]));
+			totalHITLbl_.setText(formStatString("HIT", totals[2], variances[2]));
+			totalEVALbl_.setText(formStatString("EVA", totals[3], variances[3]));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -150,25 +166,39 @@ public class ItemsListPanel extends JPanel {
 	/**
 	 * Forms a string for the statistics labels.
 	 * 
-	 * @param stat The stat.
-	 * @param statTotal The statistic total count.
-	 * @param statVariance The statistic total variance.
+	 * @param stat
+	 *            The stat.
+	 * @param statTotal
+	 *            The statistic total count.
+	 * @param statVariance
+	 *            The statistic total variance.
 	 * @return A string covering this information.
 	 */
-	private String formStatString(String stat, float statTotal, float statVariance) {
-		return "Total " + stat + ": " + (int) statTotal + " ± " + (int) statVariance;
+	private String formStatString(String stat, float statTotal,
+			float statVariance) {
+		return "Total " + stat + ": " + (int) statTotal + " ± "
+				+ (int) statVariance;
 	}
 
 	/**
 	 * Initialises the item types.
 	 * 
+	 * @param includeAbstracts
+	 *            If the list of items include abstract item types also.
 	 * @return The item types.
 	 */
-	private String[] initialiseItemTypes() {
-		String[] itemTypes = { "Item", "-Headgear", "-Face", "-Aura",
-				"-Attire", "-Footwear", "-Weapon", "--OneHanded",
-				"--TwoHanded", "--DualWield", "--AttackAndDefense" };
-		return itemTypes;
+	private String[] getItemTypes(boolean includeAbstracts) {
+		if (includeAbstracts) {
+			String[] itemTypes = { "Item", "Headgear", "Face", "Aura",
+					"Attire", "Footwear", "Weapon", "OneHanded", "TwoHanded",
+					"DualWield", "AttackAndDefense" };
+			return itemTypes;
+		} else {
+			String[] itemTypes = { "Headgear", "Face", "Aura", "Attire",
+					"Footwear", "OneHanded", "TwoHanded", "DualWield",
+					"AttackAndDefense" };
+			return itemTypes;
+		}
 	}
 
 	/**
@@ -182,29 +212,9 @@ public class ItemsListPanel extends JPanel {
 		return Class.forName("audiabolikal.equipment." + classString);
 	}
 
-	/**
-	 * A simple class which compares strings.
-	 * 
-	 * @author Samuel J. Sarjant
-	 */
-	private class ListNameComparator<T> implements Comparator<T> {
-
-		@Override
-		public int compare(T o1, T o2) {
-			return o1.toString().compareTo(o2.toString());
-		}
-
-	}
-
-	/**
-	 * An action listener for a button to open the uncovered genres dialog.
-	 * 
-	 * @author Samuel J. Sarjant
-	 */
-	private class UncoveredGenresActionListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getActionCommand().equals("Uncovered Genres")) {
 			// Find the uncovered tags
 			// Note that many may be superfluous.
 			List<String> tags = new ArrayList<String>(TagHierarchy
@@ -231,6 +241,42 @@ public class ItemsListPanel extends JPanel {
 
 			dialog.pack();
 			dialog.setVisible(true);
+		} else if (e.getActionCommand().equals("Add Item")) {
+			// Create a new item (of type headgear as default) with no values.
+			Item newItem = new Headgear();
+			newItem.initialiseMouldItem("Headgear",
+					new HashMap<String, Double>(),
+					new ProbabilityDistribution<Color>(), 0, new float[8],
+					new File[4]);
+
+			// Add the item to the list and select it, loading up the
+			// information in the detail panel.
+			((DefaultListModel) itemsList_.getModel()).addElement(newItem);
+			itemsList_.setSelectedValue(newItem, true);
+		} else if (e.getActionCommand().equals("Remove Item")) {
+
+		}
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		
+		Item item = (Item) itemsList_.getSelectedValue();
+		// If an item in the list is selected, load up the data in the details
+		// and model panels.
+		parentFrame_.itemDetails_.loadItemDetails(item);
+		parentFrame_.itemModel_.loadItemDetails(item);
+	}
+
+	/**
+	 * A simple class which compares strings.
+	 * 
+	 * @author Samuel J. Sarjant
+	 */
+	private class ListNameComparator<T> implements Comparator<T> {
+		@Override
+		public int compare(T o1, T o2) {
+			return o1.toString().compareTo(o2.toString());
 		}
 	}
 }

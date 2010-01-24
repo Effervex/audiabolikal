@@ -28,27 +28,27 @@ public class EquipmentGeneratorTest {
 		Collection<Item> items = new HashSet<Item>();
 		
 		Item helm = new Headgear();
-		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0);
+		helm.initialiseMouldItem("helm", genres, itemColors, 50, 0, 0, 40, 5, 0, 0, 0, 0, null, null, null, null);
 		items.add(helm);
 		
 		Item face = new Face();
-		face.initialiseMouldItem("angry", genres, itemColors, 5000, 0, 0, 0, 0, 0, 0, 0, 0);
+		face.initialiseMouldItem("angry", genres, itemColors, 5000, 0, 0, 0, 0, 0, 0, 0, 0, null, null, null, null);
 		items.add(face);
 		
 		Item aura = new Aura();
-		aura.initialiseMouldItem("ki", genres, itemColors, 100000, 0, 0, 20, 0, 0, 0, 0, 0);
+		aura.initialiseMouldItem("ki", genres, itemColors, 100000, 0, 0, 20, 0, 0, 0, 0, 0, null, null, null, null);
 		items.add(aura);
 		
 		Item attire = new Attire();
-		attire.initialiseMouldItem("suit", genres, itemColors, 50, 0, 0, 80, 15, 0, 0, 0, 0);
+		attire.initialiseMouldItem("suit", genres, itemColors, 50, 0, 0, 80, 15, 0, 0, 0, 0, null, null, null, null);
 		items.add(attire);
 		
 		Item footwear = new Footwear();
-		footwear.initialiseMouldItem("sandals", genres, itemColors, 10, 0, 0, 10, 2, 0, 0, 0, 0);
+		footwear.initialiseMouldItem("sandals", genres, itemColors, 10, 0, 0, 10, 2, 0, 0, 0, 0, null, null, null, null);
 		items.add(footwear);
 		
 		Item weapon = new TwoHanded();
-		weapon.initialiseMouldItem("axe", genres, itemColors, 50, 40, 15, 0, 0, 0, 0, 0, 0);
+		weapon.initialiseMouldItem("axe", genres, itemColors, 50, 40, 15, 0, 0, 0, 0, 0, 0, null, null, null, null);
 		items.add(weapon);
 		sut_ = EquipmentGenerator.initInstance(items);
 	}

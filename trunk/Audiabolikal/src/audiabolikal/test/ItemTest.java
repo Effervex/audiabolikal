@@ -30,7 +30,7 @@ public class ItemTest {
 		itemColors.add(Color.GRAY, 1);
 		Item item = new Headgear();
 		item.initialiseMouldItem("Helm", genres, itemColors, 50, 0, 0, 40, 5,
-				10, 2, 5, 1);
+				10, 2, 5, 1, null, null, null, null);
 		System.out.println("Check item names");
 		for (int i = 0; i < 10; i++) {
 			Item unique = item.spawnIndividualItem(1, true);
