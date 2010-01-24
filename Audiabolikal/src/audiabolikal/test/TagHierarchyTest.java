@@ -1,5 +1,6 @@
 package audiabolikal.test;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -82,5 +83,52 @@ public class TagHierarchyTest extends TestCase {
 		System.out.println(leaves.toString());
 		assertTrue(leaves.contains("power metal"));
 		assertFalse(leaves.contains("rock"));
+	}
+	
+	@Test
+	public void testGetTags() {
+		Collection<String> tags = sut_.getTags();
+		System.out.println("Tags:");
+		System.out.println(tags.toString());
+		assertTrue(tags.contains("power metal"));
+		assertTrue(tags.contains("rock"));
+		assertTrue(tags.contains("metal"));
+		assertTrue(tags.contains("thrash metal"));
+		
+		for (String leaf : sut_.getLeaves()) {
+			assertTrue(tags.contains(leaf));
+		}
+		for (String root : sut_.getRoots()) {
+			assertTrue(tags.contains(root));
+		}
+		assertTrue(tags.size() >= sut_.getLeaves().size() + sut_.getRoots().size());
+	}
+	
+	@Test
+	public void testGetChildren() {
+		// Null case
+		List<String> children = sut_.getChildren("melodic thrash metal");
+		assertNull(children);
+		
+		// One case
+		children = sut_.getChildren("video game music");
+		assertEquals(1, children.size());
+		assertTrue(children.contains("vgm"));
+		assertFalse(children.contains("video game music"));
+		
+		// Many case
+		children = sut_.getChildren("thrash metal");
+		assertEquals(2, children.size());
+		assertTrue(children.contains("melodic thrash metal"));
+		assertTrue(children.contains("groove metal"));
+		assertFalse(children.contains("metal"));
+		
+		// Many, grandparent case
+		children = sut_.getChildren("metal");
+		assertTrue(children.contains("melodic thrash metal"));
+		assertTrue(children.contains("groove metal"));
+		assertTrue(children.contains("thrash metal"));
+		assertTrue(children.contains("melodic death metal"));
+		assertFalse(children.contains("rock"));
 	}
 }
