@@ -5,6 +5,9 @@ import java.io.File;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.Vector;
+
+import javax.vecmath.Vector3f;
 
 import audiabolikal.util.ProbabilityDistribution;
 
@@ -69,6 +72,13 @@ public abstract class Item {
 	/** The texture for male models representing this item. */
 
 	/** The texture for female models representing this item. */
+	
+	/** The rotation values for the mesh. */
+	private Vector3f rotation_;
+	
+	/** The scale values for the mesh. */
+	private Vector3f scale_;
+	
 
 	/** The name of the item. */
 	private String name_;

@@ -48,6 +48,7 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 	private JLabel totalEVALbl_;
 
 	private Collection<Item> totalItems_;
+	private Item selectedItem_;
 
 	public ItemsListPanel(ItemBuilder parent) {
 		parentFrame_ = parent;
@@ -60,13 +61,18 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 				ItemBuilder.GAP_SIZE);
 		setLayout(layout);
 
-		setBorder(BorderFactory.createEtchedBorder());
+		setBorder(BorderFactory.createCompoundBorder(BorderFactory
+				.createEtchedBorder(), BorderFactory.createEmptyBorder(
+				ItemBuilder.BORDER, ItemBuilder.BORDER, ItemBuilder.BORDER,
+				ItemBuilder.BORDER)));
 
 		// Item combo box and value mod
-		String[] itemTypes = getItemTypes(true);
+		String[] itemTypes = ItemBuilder.getItemTypes(true);
 		itemTypeCom_ = new JComboBox(itemTypes);
+		itemTypeCom_.addActionListener(this);
 		maxValueModFld_ = new JTextField(8);
 		maxValueModFld_.setText("-1");
+		maxValueModFld_.addActionListener(this);
 		JPanel listSelector = new JPanel();
 		BorderLayout northLayout = new BorderLayout(ItemBuilder.GAP_SIZE,
 				ItemBuilder.GAP_SIZE);
@@ -134,6 +140,7 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 			// the bounds.
 			DefaultListModel listModel = (DefaultListModel) itemsList_
 					.getModel();
+			listModel.clear();
 			float[] totals = new float[4];
 			float[] variances = new float[4];
 			for (Item item : totalItems_) {
@@ -154,10 +161,14 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 			}
 
 			// Update the statistics
-			totalATKLbl_.setText(formStatString("ATK", totals[0], variances[0]));
-			totalDEFLbl_.setText(formStatString("DEF", totals[1], variances[1]));
-			totalHITLbl_.setText(formStatString("HIT", totals[2], variances[2]));
-			totalEVALbl_.setText(formStatString("EVA", totals[3], variances[3]));
+			totalATKLbl_
+					.setText(formStatString("ATK", totals[0], variances[0]));
+			totalDEFLbl_
+					.setText(formStatString("DEF", totals[1], variances[1]));
+			totalHITLbl_
+					.setText(formStatString("HIT", totals[2], variances[2]));
+			totalEVALbl_
+					.setText(formStatString("EVA", totals[3], variances[3]));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -178,27 +189,6 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 			float statVariance) {
 		return "Total " + stat + ": " + (int) statTotal + " ± "
 				+ (int) statVariance;
-	}
-
-	/**
-	 * Initialises the item types.
-	 * 
-	 * @param includeAbstracts
-	 *            If the list of items include abstract item types also.
-	 * @return The item types.
-	 */
-	private String[] getItemTypes(boolean includeAbstracts) {
-		if (includeAbstracts) {
-			String[] itemTypes = { "Item", "Headgear", "Face", "Aura",
-					"Attire", "Footwear", "Weapon", "OneHanded", "TwoHanded",
-					"DualWield", "AttackAndDefense" };
-			return itemTypes;
-		} else {
-			String[] itemTypes = { "Headgear", "Face", "Aura", "Attire",
-					"Footwear", "OneHanded", "TwoHanded", "DualWield",
-					"AttackAndDefense" };
-			return itemTypes;
-		}
 	}
 
 	/**
@@ -248,24 +238,31 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 					new HashMap<String, Double>(),
 					new ProbabilityDistribution<Color>(), 0, new float[8],
 					new File[4]);
+			totalItems_.add(newItem);
 
 			// Add the item to the list and select it, loading up the
 			// information in the detail panel.
-			((DefaultListModel) itemsList_.getModel()).addElement(newItem);
+			itemTypeCom_.setSelectedIndex(0);
+			updateListPanel();
 			itemsList_.setSelectedValue(newItem, true);
 		} else if (e.getActionCommand().equals("Remove Item")) {
-
+			totalItems_.remove(itemsList_.getSelectedValue());
+			updateListPanel();
+		} else {
+			updateListPanel();
 		}
 	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		
 		Item item = (Item) itemsList_.getSelectedValue();
-		// If an item in the list is selected, load up the data in the details
-		// and model panels.
-		parentFrame_.itemDetails_.loadItemDetails(item);
-		parentFrame_.itemModel_.loadItemDetails(item);
+		if (!item.equals(selectedItem_)) {
+			// If an item in the list is selected, load up the data in the
+			// details and model panels.
+			parentFrame_.itemDetails_.loadItemDetails(selectedItem_);
+			parentFrame_.itemModel_.loadItemDetails(selectedItem_);
+		}
+		selectedItem_ = item;
 	}
 
 	/**

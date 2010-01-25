@@ -1,6 +1,7 @@
 package audiabolikal.itemBuilding;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
@@ -19,6 +20,7 @@ import javax.swing.JTextField;
  */
 public class ItemBuilder extends JFrame {
 	public static final int GAP_SIZE = 5;
+	public static final int BORDER = 10;
 	protected ItemsListPanel itemsList_;
 	protected ItemDetailsPanel itemDetails_;
 	protected ItemModelPanel itemModel_;
@@ -62,9 +64,9 @@ public class ItemBuilder extends JFrame {
 	 */
 	public static Component createLabelledComponent(Component component,
 			String componentLabel) {
-		JPanel labelComp = new JPanel();
-		labelComp.add(new JLabel(componentLabel));
-		labelComp.add(component);
+		JPanel labelComp = new JPanel(new BorderLayout(GAP_SIZE, GAP_SIZE));
+		labelComp.add(new JLabel(componentLabel), BorderLayout.WEST);
+		labelComp.add(component, BorderLayout.CENTER);
 		return labelComp;
 	}
 
@@ -83,5 +85,26 @@ public class ItemBuilder extends JFrame {
 		addItem.setActionCommand(buttonText);
 		addItem.addActionListener(al);
 		return addItem;
+	}
+
+	/**
+	 * Initialises the item types.
+	 * 
+	 * @param includeAbstracts
+	 *            If the list of items include abstract item types also.
+	 * @return The item types.
+	 */
+	public static String[] getItemTypes(boolean includeAbstracts) {
+		if (includeAbstracts) {
+			String[] itemTypes = { "Item", "Headgear", "Face", "Aura",
+					"Attire", "Footwear", "Weapon", "OneHanded", "TwoHanded",
+					"DualWield", "AttackAndDefense" };
+			return itemTypes;
+		} else {
+			String[] itemTypes = { "Headgear", "Face", "Aura", "Attire",
+					"Footwear", "OneHanded", "TwoHanded", "DualWield",
+					"AttackAndDefense" };
+			return itemTypes;
+		}
 	}
 }
