@@ -5,5 +5,9 @@
 	<classpathentry kind="lib" path="lib/jaudiotagger-2.0.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/last-fm/last.fm-bindings.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/TableLayout-bin-jdk1.5-2009-08-26.jar"/>
+	<classpathentry kind="lib" path="lib/j3dcore.jar"/>
+	<classpathentry kind="lib" path="lib/j3dutils.jar"/>
+	<classpathentry kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
