@@ -17,9 +17,15 @@ public abstract class Weapon extends Item {
 	
 	/** The animation for a TR-BL diagonal attack. */
 	
+	/** The animation for a spinning LR attack. */
+	
+	/** The animation for a spinning RL attack. */
+	
 	/** The animation for a thrusting attack. */
 	
 	/** The animation for a magic shot attack. */
+	
+	/** The animation for a blacting attack. */
 	
 	public Weapon() {
 		className_ = "Weapon";

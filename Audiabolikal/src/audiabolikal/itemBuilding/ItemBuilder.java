@@ -6,12 +6,16 @@ import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.TreeSet;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+
+import audiabolikal.equipment.Item;
 
 /**
  * A class for defining and viewing the items present in the system.
@@ -24,8 +28,11 @@ public class ItemBuilder extends JFrame {
 	protected ItemsListPanel itemsList_;
 	protected ItemDetailsPanel itemDetails_;
 	protected ItemModelPanel itemModel_;
+	private Item currentItem_;
+	private Collection<Item> totalItems_;
 
 	public ItemBuilder() {
+		totalItems_ = new TreeSet<Item>(new ListNameComparator<Item>());
 		initialise();
 		pack();
 		setVisible(true);
@@ -105,6 +112,89 @@ public class ItemBuilder extends JFrame {
 					"Footwear", "OneHanded", "TwoHanded", "DualWield",
 					"AttackAndDefense" };
 			return itemTypes;
+		}
+	}
+
+	/**
+	 * Gets the current item being shown.
+	 * 
+	 * @return The current item.
+	 */
+	public Item getCurrentItem() {
+		return currentItem_;
+	}
+
+	/**
+	 * Sets the current item.
+	 * 
+	 * @param newItem
+	 *            The item to be the current item.
+	 * @param callingPanel
+	 *            The panel which called this method.
+	 */
+	public void setCurrentItem(Item newItem, JPanel callingPanel) {
+		// If our calling panel was the items list
+		if (callingPanel.equals(itemsList_)) {
+			// Load the item up in the details and the model panels
+			itemDetails_.loadItemDetails(newItem);
+			itemModel_.loadItemDetails(newItem);
+			// Otherwise, if our calling panel is the details, the new item may
+			// be NEW
+		} else if (callingPanel.equals(itemDetails_)) {
+			// If the new item is not in the list (different class)
+			if (!newItem.equals(currentItem_)) {
+				totalItems_.remove(currentItem_);
+				totalItems_.add(newItem);
+			}
+			itemsList_.setSelectedItem(newItem);
+			itemModel_.loadItemDetails(newItem);
+		}
+
+		currentItem_ = newItem;
+	}
+
+	/**
+	 * Gets the total items.
+	 * 
+	 * @return The collection of all items.
+	 */
+	public Collection<Item> getTotalItems() {
+		return totalItems_;
+	}
+
+	/**
+	 * Adds an item to the total items.
+	 * 
+	 * @param newItem The item being added
+	 */
+	public void addItem(Item newItem) {
+		totalItems_.add(newItem);
+		currentItem_ = newItem;
+		itemDetails_.loadItemDetails(currentItem_);
+		itemModel_.loadItemDetails(currentItem_);
+	}
+
+	/**
+	 * Removes an item from the total items.
+	 * 
+	 * @param item The item to be removed.
+	 */
+	public void removeItem(Item item) {
+		if (totalItems_.remove(item))
+			currentItem_ = null;
+		itemDetails_.loadItemDetails(currentItem_);
+		itemModel_.loadItemDetails(currentItem_);
+	}
+
+	/**
+	 * A simple class which compares strings.
+	 * 
+	 * @author Samuel J. Sarjant
+	 */
+	private class ListNameComparator<T> implements Comparator<T> {
+		@Override
+		public int compare(T o1, T o2) {
+			return o1.toString().compareTo(o2.toString());
 		}
 	}
 }
