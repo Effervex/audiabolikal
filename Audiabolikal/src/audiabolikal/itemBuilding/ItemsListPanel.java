@@ -37,7 +37,7 @@ import audiabolikal.util.ProbabilityDistribution;
 
 public class ItemsListPanel extends JPanel implements ActionListener,
 		ListSelectionListener {
-	private static final int NUM_ROWS_VISIBLE = 20;
+	private static final int NUM_ROWS_VISIBLE = 10;
 	private ItemBuilder parentFrame_;
 	private JComboBox itemTypeCom_;
 	private JTextField maxValueModFld_;
