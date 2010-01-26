@@ -11,28 +11,35 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import audiabolikal.TagHierarchy;
 import audiabolikal.equipment.Item;
 import audiabolikal.util.ProbabilityDistribution;
 
 @SuppressWarnings("serial")
 public class ItemDetailsPanel extends JPanel implements ActionListener,
-		FocusListener {
+		FocusListener, ChangeListener {
 	private static final int ATTRIBS_TOTAL = 40;
 	private ItemBuilder parentFrame_;
 	private JComboBox itemTypeCom_;
@@ -88,9 +95,11 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 		// Attributes
 		attribsLeftLbl_ = new JLabel("Attribute Points: " + ATTRIBS_TOTAL);
 		add(attribsLeftLbl_, "1,4,2,4,f,c");
+		add(ItemBuilder.createButton("Jiggle Attributes", this), "3,4,4,4,r,c");
 		String[] attribs = { "ATK", "DEF", "HIT", "EVA" };
 		for (int i = 0; i < attribsSpn_.length; i++) {
 			attribsSpn_[i] = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
+			attribsSpn_[i].addChangeListener(this);
 			String loc = (i % 2) * 2 + 1 + "," + (i / 2 + 5);
 			add(ItemBuilder.createLabelledComponent(attribsSpn_[i], attribs[i]
 					+ ": "), loc);
@@ -108,9 +117,10 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 
 		// Genres list
 		add(new JLabel("Genres:"), "1, 8");
-		TableModel model = new DistributionTableModel("Genre");
+		TableModel model = new DefaultTableModel(new Object[] { "Genre",
+				"Value" }, 0);
 		genreTable_ = new JTable(model);
-		genreTable_.setPreferredScrollableViewportSize(new Dimension(100, 100));
+		genreTable_.setPreferredScrollableViewportSize(new Dimension(10, 50));
 		JScrollPane genreScroller = new JScrollPane(genreTable_);
 		add(genreScroller, "1, 9, 4, 9, f, f");
 		add(ItemBuilder.createButton("Add Genre", this), "1,10,2,10,c,c");
@@ -118,10 +128,9 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 
 		// Colours list
 		add(new JLabel("Colours:"), "1, 11");
-		model = new DistributionTableModel("Colour");
+		model = new DefaultTableModel(new Object[] { "Colour", "Value" }, 0);
 		colourTable_ = new JTable(model);
-		colourTable_
-				.setPreferredScrollableViewportSize(new Dimension(100, 100));
+		colourTable_.setPreferredScrollableViewportSize(new Dimension(10, 50));
 		JScrollPane colourScroller = new JScrollPane(colourTable_);
 		add(colourScroller, "1, 12, 4, 12, f, f");
 		add(ItemBuilder.createButton("Add Colour", this), "1,13,2,13,c,c");
@@ -209,11 +218,20 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 		if (item == null) {
 			applyButton_.setEnabled(false);
 		} else {
-			System.out.println("Done.");
 			applyButton_.setEnabled(true);
 			itemTypeCom_.setSelectedItem(item.getClass().getSimpleName());
 			itemNameFld_.setText(item.getName());
 
+			// For each attribute
+			attribsSpn_[0].setValue(item.getBaseAttack());
+			attribsSpn_[1].setValue(item.getBaseDefense());
+			attribsSpn_[2].setValue(item.getBaseHit());
+			attribsSpn_[3].setValue(item.getBaseEvasion());
+			varianceSpn_[0].setValue(item.getAttackVariance());
+			varianceSpn_[1].setValue(item.getDefenseVariance());
+			varianceSpn_[2].setValue(item.getHitVariance());
+			varianceSpn_[3].setValue(item.getEvasionVariance());
+			updateAttribsStats();
 		}
 	}
 
@@ -223,8 +241,8 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 	private void storeDetails(Item item) {
 		// Parsing the data
 		String name = itemNameFld_.getText();
-		Map<String, Double> genres = new HashMap<String, Double>();
-		ProbabilityDistribution<Color> itemColors = new ProbabilityDistribution<Color>();
+		Map<String, Double> genres = compileGenres();
+		ProbabilityDistribution<Color> itemColors = compileColour();
 		float valueMod = Float.parseFloat(valueModFld_.getText());
 		float[] attributes = new float[attribsSpn_.length * 2];
 		for (int i = 0; i < attribsSpn_.length; i++) {
@@ -248,6 +266,57 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 				attributes, modelFiles, rotation, scale);
 	}
 
+	/**
+	 * Compiles the mapping of genres from the genre table.
+	 * 
+	 * @return A mapping of genres to weights for the item.
+	 */
+	private Map<String, Double> compileGenres() {
+		Map<String, Double> genreMap = new HashMap<String, Double>();
+		DefaultTableModel model = (DefaultTableModel) genreTable_.getModel();
+
+		// For each genre in the table.
+		for (int y = 0; y < model.getRowCount(); y++) {
+			String genre = (String) model.getValueAt(y, 0);
+			Double value = (Double) model.getValueAt(y, 1);
+			genreMap.put(genre, value);
+		}
+
+		return genreMap;
+	}
+
+	/**
+	 * Compiles a distribution of colours the item can take on.
+	 * 
+	 * @return A normalised Probability Distribution of Colors.
+	 */
+	private ProbabilityDistribution<Color> compileColour() {
+		ProbabilityDistribution<Color> colors = new ProbabilityDistribution<Color>();
+
+		DefaultTableModel model = (DefaultTableModel) genreTable_.getModel();
+
+		// For each genre in the table.
+		for (int y = 0; y < model.getRowCount(); y++) {
+			Color genre = (Color) model.getValueAt(y, 0);
+			Double value = (Double) model.getValueAt(y, 1);
+			colors.add(genre, value);
+		}
+
+		return colors;
+	}
+
+	/**
+	 * Removes all occurrences from a table from a collection.
+	 *  
+	 * @param table The table.
+	 * @param collection The collection of things.
+	 */
+	private void removeExisting(JTable table, Collection<?> collection) {
+		for (int y = 0; y < table.getRowCount(); y++) {
+			collection.remove(table.getValueAt(y, 0));
+		}
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Apply")) {
@@ -267,7 +336,45 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-		} else if (e.getActionCommand().equals("Cancel")) {
+		} else if (e.getActionCommand().equals("Add Genre")) {
+			TreeSet<String> genreSet = new TreeSet<String>(TagHierarchy
+					.getInstance().getTags());
+			removeExisting(genreTable_, genreSet);
+			String[] genres = genreSet.toArray(new String[genreSet.size()]);
+			String result = (String) JOptionPane.showInputDialog(parentFrame_,
+					"Choose a genre:", "Genre Weighting",
+					JOptionPane.PLAIN_MESSAGE, null, genres, null);
+			if (result == null)
+				return;
+
+			// Get the weight value
+			Double value = -1.0;
+			while ((value <= 0) || (value > 1)) {
+				String weight = JOptionPane.showInputDialog(parentFrame_,
+						"Weighting for '" + result + "' (0.1-1.0):",
+						"Genre Weighting", JOptionPane.PLAIN_MESSAGE);
+				if (weight == null)
+					return;
+				try {
+					value = Double.parseDouble(weight);
+				} catch (Exception ex) {
+				}
+			}
+
+			DefaultTableModel model = (DefaultTableModel) genreTable_
+					.getModel();
+			model.addRow(new Object[] { result, value });
+		} else if (e.getActionCommand().equals("Remove Genre")) {
+			int row = genreTable_.getSelectedRow();
+			if (row != -1) {
+				DefaultTableModel model = (DefaultTableModel) genreTable_.getModel();
+				model.removeRow(row);
+			}
+		} else if (e.getActionCommand().equals("Add Colour")) {
+
+		} else if (e.getActionCommand().equals("Remove Colour")) {
+
+		} else if (e.getActionCommand().equals("Jiggle Attributes")) {
 
 		}
 	}
@@ -280,58 +387,11 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 
 	@Override
 	public void focusLost(FocusEvent arg0) {
-		// TODO Auto-generated method stub
-
+		// Do nothing
 	}
 
-	@SuppressWarnings("serial")
-	private class DistributionTableModel extends AbstractTableModel {
-		private String[] columnHeader_;
-		private ArrayList<Object> data_;
-		private ArrayList<Double> values_;
-
-		public DistributionTableModel(String dataName) {
-			columnHeader_ = new String[2];
-			columnHeader_[0] = dataName;
-			columnHeader_[1] = "Value";
-
-			data_ = new ArrayList<Object>();
-			values_ = new ArrayList<Double>();
-		}
-
-		@Override
-		public String getColumnName(int index) {
-			return columnHeader_[index];
-		}
-
-		@Override
-		public Class<?> getColumnClass(int index) {
-			if (index == 0)
-				return Object.class;
-			if (index == 1)
-				return Double.class;
-			return null;
-		}
-
-		@Override
-		public int getColumnCount() {
-			return columnHeader_.length;
-		}
-
-		@Override
-		public int getRowCount() {
-			return data_.size();
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			if (columnIndex == 0) {
-				return data_.get(rowIndex);
-			} else if (columnIndex == 1) {
-				return values_.get(rowIndex);
-			}
-			return null;
-		}
-
+	@Override
+	public void stateChanged(ChangeEvent arg0) {
+		updateAttribsStats();
 	}
 }
