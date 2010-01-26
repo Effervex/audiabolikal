@@ -2,15 +2,20 @@ package audiabolikal.itemBuilding;
 
 import info.clearthought.layout.TableLayout;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,6 +28,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
 import audiabolikal.equipment.Item;
+import audiabolikal.util.ProbabilityDistribution;
 
 @SuppressWarnings("serial")
 public class ItemDetailsPanel extends JPanel implements ActionListener,
@@ -48,8 +54,7 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 	private JTextField scaleX_;
 	private JTextField scaleY_;
 	private JTextField scaleZ_;
-
-	private Item currentItem_;
+	private JButton applyButton_;
 
 	public ItemDetailsPanel(ItemBuilder parent) {
 		parentFrame_ = parent;
@@ -62,8 +67,8 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 		double f = TableLayout.FILL;
 		double[][] size = {
 				{ b, f, f, f, f, b },
-				{ b, p, p, b, p, p, p, p, p, f, p, p, f, p, p, p, p, p, p, p, b,
-						p, b } };
+				{ b, p, p, b, p, p, p, p, p, f, p, p, f, p, p, p, p, p, p, p,
+						b, p, b } };
 		TableLayout layout = new TableLayout(size);
 		layout.setVGap(ItemBuilder.GAP_SIZE);
 		layout.setHGap(ItemBuilder.GAP_SIZE);
@@ -125,40 +130,51 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 		// Mesh and Texture buttons
 		maleMeshFld_ = new JTextField();
 		maleMeshFld_.addFocusListener(this);
-		add(ItemBuilder.createLabelledComponent(maleMeshFld_, "Male Mesh:"), "1,14,4,14,f,c");
+		add(ItemBuilder.createLabelledComponent(maleMeshFld_, "Male Mesh:"),
+				"1,14,4,14,f,c");
 		maleTextureFld_ = new JTextField();
 		maleTextureFld_.addFocusListener(this);
-		add(ItemBuilder.createLabelledComponent(maleTextureFld_, "Male Texture:"), "1,15,4,15,f,c");
+		add(ItemBuilder.createLabelledComponent(maleTextureFld_,
+				"Male Texture:"), "1,15,4,15,f,c");
 		femaleMeshFld_ = new JTextField();
 		femaleMeshFld_.addFocusListener(this);
-		add(ItemBuilder.createLabelledComponent(femaleMeshFld_, "Female Mesh:"), "1,16,4,16,f,c");
+		add(
+				ItemBuilder.createLabelledComponent(femaleMeshFld_,
+						"Female Mesh:"), "1,16,4,16,f,c");
 		femaleTextureFld_ = new JTextField();
 		femaleTextureFld_.addFocusListener(this);
-		add(ItemBuilder.createLabelledComponent(femaleTextureFld_, "Female Texture:"), "1,17,4,17,f,c");
-		
+		add(ItemBuilder.createLabelledComponent(femaleTextureFld_,
+				"Female Texture:"), "1,17,4,17,f,c");
+
 		// Rotation boxes
 		JPanel rotationPanel = new JPanel();
 		rotationX_ = new JTextField("0", 3);
-		rotationPanel.add(ItemBuilder.createLabelledComponent(rotationX_, "Rotation - X:"));
+		rotationPanel.add(ItemBuilder.createLabelledComponent(rotationX_,
+				"Rotation - X:"));
 		rotationY_ = new JTextField("0", 3);
-		rotationPanel.add(ItemBuilder.createLabelledComponent(rotationY_, "Y:"));
+		rotationPanel
+				.add(ItemBuilder.createLabelledComponent(rotationY_, "Y:"));
 		rotationZ_ = new JTextField("0", 3);
-		rotationPanel.add(ItemBuilder.createLabelledComponent(rotationZ_, "Z:"));
+		rotationPanel
+				.add(ItemBuilder.createLabelledComponent(rotationZ_, "Z:"));
 		add(rotationPanel, "1,18,4,18,f,c");
-		
+
 		// Scale boxes
 		JPanel scalePanel = new JPanel();
 		scaleX_ = new JTextField("1.0", 5);
-		scalePanel.add(ItemBuilder.createLabelledComponent(scaleX_, "Scale - X:"));
+		scalePanel.add(ItemBuilder.createLabelledComponent(scaleX_,
+				"Scale - X:"));
 		scaleY_ = new JTextField("1.0", 5);
 		scalePanel.add(ItemBuilder.createLabelledComponent(scaleY_, "Y:"));
 		scaleZ_ = new JTextField("1.0", 5);
 		scalePanel.add(ItemBuilder.createLabelledComponent(scaleZ_, "Z:"));
 		add(scalePanel, "1,19,4,19,f,c");
-		
+
 		// Apply and Cancel buttons
-		add(ItemBuilder.createButton("Apply", this), "3,21");
-		add(ItemBuilder.createButton("Cancel", this), "4,21");
+		applyButton_ = ItemBuilder.createButton("Apply", this);
+		applyButton_.setEnabled(false);
+		add(applyButton_, "4,21");
+		// add(ItemBuilder.createButton("Cancel", this), "4,21");
 
 		updateAttribsStats();
 	}
@@ -190,25 +206,67 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 	 *            The item being loaded.
 	 */
 	public void loadItemDetails(Item item) {
-		if (item != currentItem_) {
-			currentItem_ = item;
+		if (item == null) {
+			applyButton_.setEnabled(false);
+		} else {
+			System.out.println("Done.");
+			applyButton_.setEnabled(true);
+			itemTypeCom_.setSelectedItem(item.getClass().getSimpleName());
+			itemNameFld_.setText(item.getName());
+
 		}
 	}
 
 	/**
 	 * Stores the current details into the item.
 	 */
-	private void storeDetails() {
-		// TODO Auto-generated method stub
-		
+	private void storeDetails(Item item) {
+		// Parsing the data
+		String name = itemNameFld_.getText();
+		Map<String, Double> genres = new HashMap<String, Double>();
+		ProbabilityDistribution<Color> itemColors = new ProbabilityDistribution<Color>();
+		float valueMod = Float.parseFloat(valueModFld_.getText());
+		float[] attributes = new float[attribsSpn_.length * 2];
+		for (int i = 0; i < attribsSpn_.length; i++) {
+			attributes[i * 2] = ((SpinnerNumberModel) attribsSpn_[i].getModel())
+					.getNumber().intValue();
+			attributes[i * 2 + 1] = ((SpinnerNumberModel) varianceSpn_[i]
+					.getModel()).getNumber().intValue();
+		}
+		File[] modelFiles = { new File(maleMeshFld_.getText()),
+				new File(femaleMeshFld_.getText()),
+				new File(maleTextureFld_.getText()),
+				new File(femaleTextureFld_.getText()) };
+		float[] rotation = { Float.parseFloat(rotationX_.getText()),
+				Float.parseFloat(rotationY_.getText()),
+				Float.parseFloat(rotationZ_.getText()) };
+		float[] scale = { Float.parseFloat(scaleX_.getText()),
+				Float.parseFloat(scaleY_.getText()),
+				Float.parseFloat(scaleZ_.getText()) };
+
+		item.initialiseMouldItem(name, genres, itemColors, valueMod,
+				attributes, modelFiles, rotation, scale);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Apply")) {
-			storeDetails();
-			parentFrame_.itemsList_.updateListPanel();
-			parentFrame_.itemModel_.loadItemDetails(currentItem_);
+			try {
+				// Check item is of the same type.
+				Item item = parentFrame_.getCurrentItem();
+				if (!itemTypeCom_.getSelectedItem().equals(item.getClassName())) {
+					item = (Item) Class
+							.forName(
+									"audiabolikal.equipment."
+											+ itemTypeCom_.getSelectedItem()
+													.toString()).newInstance();
+				}
+
+				storeDetails(item);
+				parentFrame_.setCurrentItem(item, this);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		} else if (e.getActionCommand().equals("Cancel")) {
 
 		}

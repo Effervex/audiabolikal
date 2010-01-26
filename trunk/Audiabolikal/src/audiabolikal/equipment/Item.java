@@ -66,19 +66,22 @@ public abstract class Item {
 	private Random random_;
 
 	/** The mesh for male models representing this item. */
+	private File maleMeshFile_;
 
 	/** The mesh for female models representing this item. */
+	private File femaleMeshFile_;
 
 	/** The texture for male models representing this item. */
+	private File maleTextureFile_;
 
 	/** The texture for female models representing this item. */
-	
+	private File femaleTextureFile_;
+
 	/** The rotation values for the mesh. */
-	private Vector3f rotation_;
-	
+	private float[] rotation_;
+
 	/** The scale values for the mesh. */
-	private Vector3f scale_;
-	
+	private float[] scale_;
 
 	/** The name of the item. */
 	private String name_;
@@ -145,6 +148,18 @@ public abstract class Item {
 	 *            The mesh file for the female model.
 	 * @param maleTextureFile
 	 *            The texture file for the male model.
+	 * @param rotationX
+	 *            The x rotation of the model.
+	 * @param rotationY
+	 *            The y rotation of the model.
+	 * @param rotationZ
+	 *            The z rotation of the model.
+	 * @param scaleX
+	 *            The x scaling of the model.
+	 * @param scaleY
+	 *            The y scaling of the model.
+	 * @param scaleZ
+	 *            The z scaling of the model.
 	 * @param femaleTexttureFile
 	 *            The texture file for the female model.
 	 */
@@ -153,7 +168,9 @@ public abstract class Item {
 			float baseAttack, float attackVariance, float baseDefense,
 			float defenseVariance, float baseHit, float hitVariance,
 			float baseEvasion, float evasionVariance, File maleMeshFile,
-			File femaleMeshFile, File maleTextureFile, File femaleTextureFile) {
+			File femaleMeshFile, File maleTextureFile, File femaleTextureFile,
+			float rotationX, float rotationY, float rotationZ, float scaleX,
+			float scaleY, float scaleZ) {
 		individual_ = false;
 		name_ = name;
 		genres_ = genres;
@@ -167,6 +184,18 @@ public abstract class Item {
 		baseEvasion_ = baseEvasion;
 		hitVariance_ = hitVariance;
 		evasionVariance_ = evasionVariance;
+		maleMeshFile_ = maleMeshFile;
+		femaleMeshFile_ = femaleMeshFile;
+		maleTextureFile_ = maleTextureFile;
+		femaleTextureFile_ = femaleTextureFile;
+		rotation_ = new float[3];
+		rotation_[0] = rotationX;
+		rotation_[1] = rotationY;
+		rotation_[2] = rotationZ;
+		scale_ = new float[3];
+		scale_[0] = scaleX;
+		scale_[1] = scaleY;
+		scale_[2] = scaleZ;
 		random_ = new Random();
 	}
 
@@ -187,14 +216,20 @@ public abstract class Item {
 	 *            ATK, DEF, HIT, EVA.
 	 * @param modelFiles
 	 *            The files for the item models.
+	 * @param rotation
+	 *            The rotation values.
+	 * @param scale
+	 *            The scale values.
 	 */
 	public void initialiseMouldItem(String name, Map<String, Double> genres,
 			ProbabilityDistribution<Color> itemColors, float valueMod,
-			float[] attributes, File[] modelFiles) {
+			float[] attributes, File[] modelFiles, float[] rotation,
+			float[] scale) {
 		initialiseMouldItem(name, genres, itemColors, valueMod, attributes[0],
 				attributes[1], attributes[2], attributes[3], attributes[4],
 				attributes[5], attributes[6], attributes[7], modelFiles[0],
-				modelFiles[1], modelFiles[2], modelFiles[3]);
+				modelFiles[1], modelFiles[2], modelFiles[3], rotation[0],
+				rotation[1], rotation[2], scale[0], scale[1], scale[2]);
 	}
 
 	/**
@@ -226,6 +261,12 @@ public abstract class Item {
 		level_ = level;
 		name_ = name;
 		genres_ = generalItem.genres_;
+		maleMeshFile_ = generalItem.maleMeshFile_;
+		femaleMeshFile_ = generalItem.femaleMeshFile_;
+		maleTextureFile_ = generalItem.maleTextureFile_;
+		femaleTextureFile_ = generalItem.femaleTextureFile_;
+		rotation_ = generalItem.rotation_;
+		scale_ = generalItem.scale_;
 		// Base attack now defines the levelling constant
 		baseAttack_ = generalItem.baseAttack_;
 		baseDefense_ = generalItem.baseDefense_;
@@ -528,7 +569,7 @@ public abstract class Item {
 	 * @return The base evasion.
 	 */
 	public float getBaseEvasion() {
-		return baseAttack_;
+		return baseEvasion_;
 	}
 
 	/**
@@ -605,20 +646,6 @@ public abstract class Item {
 	}
 
 	@Override
-	public String toString() {
-		// If generic item, use simple name
-		if (!individual_)
-			return name_;
-		StringBuffer buffer = new StringBuffer("Level " + level_ + " " + name_
-				+ "\n");
-		buffer.append("ATK: " + (int) Math.round(attack_) + ", ");
-		buffer.append("DEF: " + (int) Math.round(defense_) + ", ");
-		buffer.append("HIT: " + (int) Math.round(hit_) + ", ");
-		buffer.append("EVA: " + (int) Math.round(evasion_));
-		return buffer.toString();
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -629,6 +656,8 @@ public abstract class Item {
 		result = prime * result + Float.floatToIntBits(baseEvasion_);
 		result = prime * result + Float.floatToIntBits(baseHit_);
 		result = prime * result + Float.floatToIntBits(baseValue_);
+		result = prime * result
+				+ ((className_ == null) ? 0 : className_.hashCode());
 		result = prime
 				* result
 				+ ((colourDistribution_ == null) ? 0 : colourDistribution_
@@ -638,12 +667,26 @@ public abstract class Item {
 		result = prime * result + Float.floatToIntBits(defense_);
 		result = prime * result + Float.floatToIntBits(evasionVariance_);
 		result = prime * result + Float.floatToIntBits(evasion_);
+		result = prime * result
+				+ ((femaleMeshFile_ == null) ? 0 : femaleMeshFile_.hashCode());
+		result = prime
+				* result
+				+ ((femaleTextureFile_ == null) ? 0 : femaleTextureFile_
+						.hashCode());
 		result = prime * result + ((genres_ == null) ? 0 : genres_.hashCode());
 		result = prime * result + Float.floatToIntBits(hitVariance_);
 		result = prime * result + Float.floatToIntBits(hit_);
 		result = prime * result + (individual_ ? 1231 : 1237);
 		result = prime * result + level_;
+		result = prime * result
+				+ ((maleMeshFile_ == null) ? 0 : maleMeshFile_.hashCode());
+		result = prime
+				* result
+				+ ((maleTextureFile_ == null) ? 0 : maleTextureFile_.hashCode());
 		result = prime * result + ((name_ == null) ? 0 : name_.hashCode());
+		result = prime * result
+				+ ((rotation_ == null) ? 0 : rotation_.hashCode());
+		result = prime * result + ((scale_ == null) ? 0 : scale_.hashCode());
 		result = prime * result + value_;
 		return result;
 	}
@@ -656,7 +699,7 @@ public abstract class Item {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		final Item other = (Item) obj;
+		Item other = (Item) obj;
 		if (Float.floatToIntBits(attackVariance_) != Float
 				.floatToIntBits(other.attackVariance_))
 			return false;
@@ -677,6 +720,11 @@ public abstract class Item {
 			return false;
 		if (Float.floatToIntBits(baseValue_) != Float
 				.floatToIntBits(other.baseValue_))
+			return false;
+		if (className_ == null) {
+			if (other.className_ != null)
+				return false;
+		} else if (!className_.equals(other.className_))
 			return false;
 		if (colourDistribution_ == null) {
 			if (other.colourDistribution_ != null)
@@ -700,6 +748,16 @@ public abstract class Item {
 		if (Float.floatToIntBits(evasion_) != Float
 				.floatToIntBits(other.evasion_))
 			return false;
+		if (femaleMeshFile_ == null) {
+			if (other.femaleMeshFile_ != null)
+				return false;
+		} else if (!femaleMeshFile_.equals(other.femaleMeshFile_))
+			return false;
+		if (femaleTextureFile_ == null) {
+			if (other.femaleTextureFile_ != null)
+				return false;
+		} else if (!femaleTextureFile_.equals(other.femaleTextureFile_))
+			return false;
 		if (genres_ == null) {
 			if (other.genres_ != null)
 				return false;
@@ -714,14 +772,57 @@ public abstract class Item {
 			return false;
 		if (level_ != other.level_)
 			return false;
+		if (maleMeshFile_ == null) {
+			if (other.maleMeshFile_ != null)
+				return false;
+		} else if (!maleMeshFile_.equals(other.maleMeshFile_))
+			return false;
+		if (maleTextureFile_ == null) {
+			if (other.maleTextureFile_ != null)
+				return false;
+		} else if (!maleTextureFile_.equals(other.maleTextureFile_))
+			return false;
 		if (name_ == null) {
 			if (other.name_ != null)
 				return false;
 		} else if (!name_.equals(other.name_))
 			return false;
+		if (rotation_ == null) {
+			if (other.rotation_ != null)
+				return false;
+		} else if (!rotation_.equals(other.rotation_))
+			return false;
+		if (scale_ == null) {
+			if (other.scale_ != null)
+				return false;
+		} else if (!scale_.equals(other.scale_))
+			return false;
 		if (value_ != other.value_)
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		if (!individual_) {
+			buffer.append(name_ + " - ");
+			buffer.append("ATK: " + (int) Math.round(baseAttack_) + " ± "
+					+ (int) Math.round(attackVariance_) + ", ");
+			buffer.append("DEF: " + (int) Math.round(baseDefense_) + " ± "
+					+ (int) Math.round(defenseVariance_) + ", ");
+			buffer.append("HIT: " + (int) Math.round(baseHit_) + " ± "
+					+ (int) Math.round(hitVariance_) + ", ");
+			buffer.append("EVA: " + (int) Math.round(baseEvasion_) + " ± "
+					+ (int) Math.round(evasionVariance_));
+		} else {
+			buffer.append("Level " + level_ + " " + name_ + "\n");
+			buffer.append("ATK: " + (int) Math.round(attack_) + ", ");
+			buffer.append("DEF: " + (int) Math.round(defense_) + ", ");
+			buffer.append("HIT: " + (int) Math.round(hit_) + ", ");
+			buffer.append("EVA: " + (int) Math.round(evasion_));
+		}
+		return buffer.toString();
 	}
 
 }

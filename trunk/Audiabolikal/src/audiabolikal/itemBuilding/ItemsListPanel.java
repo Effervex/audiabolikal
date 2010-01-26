@@ -47,12 +47,8 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 	private JLabel totalHITLbl_;
 	private JLabel totalEVALbl_;
 
-	private Collection<Item> totalItems_;
-	private Item selectedItem_;
-
 	public ItemsListPanel(ItemBuilder parent) {
 		parentFrame_ = parent;
-		totalItems_ = new TreeSet<Item>(new ListNameComparator<Item>());
 		initialise();
 	}
 
@@ -87,6 +83,7 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 		itemsList_ = new JList(new DefaultListModel());
 		itemsList_.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		itemsList_.setVisibleRowCount(NUM_ROWS_VISIBLE);
+		itemsList_.addListSelectionListener(this);
 		JScrollPane listScroll = new JScrollPane(itemsList_);
 		listPanel.add(listScroll, BorderLayout.CENTER);
 
@@ -143,7 +140,7 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 			listModel.clear();
 			float[] totals = new float[4];
 			float[] variances = new float[4];
-			for (Item item : totalItems_) {
+			for (Item item : parentFrame_.getTotalItems()) {
 				// If the item is of the same or subclass of the type
 				if (typeClass.isAssignableFrom(item.getClass())) {
 					if (item.getValueMod() <= maxValue) {
@@ -237,43 +234,42 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 			newItem.initialiseMouldItem("Headgear",
 					new HashMap<String, Double>(),
 					new ProbabilityDistribution<Color>(), 0, new float[8],
-					new File[4]);
-			totalItems_.add(newItem);
+					new File[4], new float[3], new float[] { 1, 1, 1 });
+			parentFrame_.addItem(newItem);
 
 			// Add the item to the list and select it, loading up the
 			// information in the detail panel.
-			itemTypeCom_.setSelectedIndex(0);
-			updateListPanel();
-			itemsList_.setSelectedValue(newItem, true);
+			setSelectedItem(newItem);
+			// valueChanged(null);
 		} else if (e.getActionCommand().equals("Remove Item")) {
-			totalItems_.remove(itemsList_.getSelectedValue());
+			parentFrame_.removeItem((Item) itemsList_.getSelectedValue());
 			updateListPanel();
 		} else {
 			updateListPanel();
 		}
 	}
 
+	/**
+	 * Sets an item in the list to be selected.
+	 * 
+	 * @param newItem
+	 *            The item to be selected.
+	 */
+	public void setSelectedItem(Item newItem) {
+		itemTypeCom_.setSelectedIndex(0);
+		updateListPanel();
+		itemsList_.setSelectedValue(newItem, true);
+	}
+
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		Item item = (Item) itemsList_.getSelectedValue();
-		if (!item.equals(selectedItem_)) {
-			// If an item in the list is selected, load up the data in the
-			// details and model panels.
-			parentFrame_.itemDetails_.loadItemDetails(selectedItem_);
-			parentFrame_.itemModel_.loadItemDetails(selectedItem_);
-		}
-		selectedItem_ = item;
-	}
-
-	/**
-	 * A simple class which compares strings.
-	 * 
-	 * @author Samuel J. Sarjant
-	 */
-	private class ListNameComparator<T> implements Comparator<T> {
-		@Override
-		public int compare(T o1, T o2) {
-			return o1.toString().compareTo(o2.toString());
+		if (item != null) {
+			if (!item.equals(parentFrame_.getCurrentItem())) {
+				// If an item in the list is selected, load up the data in the
+				// details and model panels.
+				parentFrame_.setCurrentItem(item, this);
+			}
 		}
 	}
 }
