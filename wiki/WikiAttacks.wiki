@@ -34,7 +34,14 @@ A problem with this song sampling is that it may be quite memory intensive in th
 = Levelling up attacks =
 The more an attack is used, the more ATK-EXP it receives, allowing the user to increase the capabilities of the attack by increasing properties of the attack. Initially the attack has a single property generated from the initialisation, but in a skill fashion, the user can add capabilities to the attack.
 
-As well as receiving ATK-EXP for using the attack, the user receives free ATK-EXP based on how much that track has been listened to using Last.fm. The current coefficient for free ATK-EXP is 0.1 of the total track counts for the user overall (floored). So a track listened to 85 times and created into an attack will get a free 8 ATK-EXP, plus the initial attack bonus.
+*Free ATK-EXP*
+As well as receiving ATK-EXP for using the attack, the user receives free ATK-EXP based on how much that track has been listened to using Last.fm.
+ * For the first 10 times the track has been listened, the user receives 1 × listens (10)
+ * For the first 100 times the track has been listened (excluding the first 10) the user receives 0.1 × listens (10 + 9)
+ * For the first 1000 times the track has been listened (excluding the first 100) the user receives 0.01 × listens (10 + 9 + 9)
+ * Etc.
+
+The reason for the higher cost fro more track listens is because some users seem to have music constantly feeding toward Last.fm, skewing their charts into the 1000's or more. For the average user, listening to a track 100 times is quite a feat.
 
 Each attack boost has 10 levels. Graphically, the attack animation is scaled with each level:
 
