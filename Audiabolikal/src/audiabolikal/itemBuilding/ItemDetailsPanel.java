@@ -234,6 +234,37 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 			varianceSpn_[3].setValue(item.getEvasionVariance());
 			valueModFld_.setText(item.getValueMod() + "");
 			updateAttribsStats();
+
+			DefaultTableModel model = (DefaultTableModel) genreTable_
+					.getModel();
+			model.setNumRows(0);
+			for (String genre : item.getGenres()) {
+				model
+						.addRow(new Object[] { genre,
+								item.getGenreWeight(genre) });
+			}
+
+			model = (ColourTableModel) colourTable_.getModel();
+			model.setNumRows(0);
+			for (Color color : item.getColorDistribution()) {
+				model.addRow(new Object[] { color,
+						item.getColorDistribution().getProb(color) });
+			}
+			
+			maleMeshFld_.setText(item.getMaleMeshFile() + "");
+			maleTextureFld_.setText(item.getMaleTextureFile() + "");
+			femaleMeshFld_.setText(item.getFemaleMeshFile() + "");
+			femaleTextureFld_.setText(item.getFemaleTextureFile() + "");
+			
+			float[] rotation = item.getRotation();
+			rotationX_.setText(rotation[0] + "");
+			rotationY_.setText(rotation[1] + "");
+			rotationZ_.setText(rotation[2] + "");
+			
+			float[] scale = item.getScale();
+			scaleX_.setText(scale[0] + "");
+			scaleY_.setText(scale[1] + "");
+			scaleZ_.setText(scale[2] + "");
 		}
 	}
 
@@ -295,7 +326,7 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 	private ProbabilityDistribution<Color> compileColour() {
 		ProbabilityDistribution<Color> colors = new ProbabilityDistribution<Color>();
 
-		DefaultTableModel model = (DefaultTableModel) genreTable_.getModel();
+		ColourTableModel model = (ColourTableModel) colourTable_.getModel();
 
 		// For each genre in the table.
 		for (int y = 0; y < model.getRowCount(); y++) {
@@ -427,8 +458,8 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 				// Variance
 				model = (SpinnerNumberModel) varianceSpn_[i].getModel();
 				value = model.getNumber().doubleValue();
-				value += Math.max(0,
-						(int) (random.nextGaussian() * jiggleAmount * 0.5));
+				value += Math.max(0, (int) (random.nextGaussian()
+						* jiggleAmount * 0.5));
 				model.setValue(value);
 			}
 		}

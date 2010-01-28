@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Comparator;
@@ -13,6 +14,9 @@ import java.util.TreeSet;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import audiabolikal.equipment.Item;
@@ -22,7 +26,7 @@ import audiabolikal.equipment.Item;
  * 
  * @author Samuel J. Sarjant
  */
-public class ItemBuilder extends JFrame {
+public class ItemBuilder extends JFrame implements ActionListener {
 	public static final int GAP_SIZE = 5;
 	public static final int BORDER = 10;
 	protected ItemsListPanel itemsList_;
@@ -30,6 +34,7 @@ public class ItemBuilder extends JFrame {
 	protected ItemModelPanel itemModel_;
 	private Item currentItem_;
 	private Collection<Item> totalItems_;
+	private JMenuBar mainMenu_;
 
 	public ItemBuilder() {
 		totalItems_ = new TreeSet<Item>(new ListNameComparator<Item>());
@@ -54,6 +59,19 @@ public class ItemBuilder extends JFrame {
 
 		itemModel_ = new ItemModelPanel(this);
 		add(itemModel_);
+		
+		mainMenu_ = new JMenuBar();
+		JMenu main = new JMenu("File");
+		JMenuItem load = new JMenuItem("Load...");
+		load.setActionCommand("Load");
+		load.addActionListener(this);
+		JMenuItem save = new JMenuItem("Save...");
+		save.setActionCommand("Save");
+		save.addActionListener(this);
+		main.add(load);
+		main.add(save);
+		mainMenu_.add(main);
+		setJMenuBar(mainMenu_);
 	}
 
 	public static void main(String[] args) {
@@ -196,5 +214,11 @@ public class ItemBuilder extends JFrame {
 		public int compare(T o1, T o2) {
 			return o1.toString().compareTo(o2.toString());
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
