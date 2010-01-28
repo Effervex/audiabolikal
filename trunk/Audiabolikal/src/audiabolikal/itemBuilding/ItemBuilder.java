@@ -7,17 +7,22 @@ import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileFilter;
 
 import audiabolikal.equipment.Item;
 
@@ -35,9 +40,11 @@ public class ItemBuilder extends JFrame implements ActionListener {
 	private Item currentItem_;
 	private Collection<Item> totalItems_;
 	private JMenuBar mainMenu_;
+	JFileChooser fc_;
 
 	public ItemBuilder() {
 		totalItems_ = new TreeSet<Item>(new ListNameComparator<Item>());
+		fc_ = new JFileChooser();
 		initialise();
 		pack();
 		setVisible(true);
@@ -203,6 +210,30 @@ public class ItemBuilder extends JFrame implements ActionListener {
 		itemDetails_.loadItemDetails(currentItem_);
 		itemModel_.loadItemDetails(currentItem_);
 	}
+	
+	protected JFileChooser getFileChooser() {
+		return fc_;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		try {
+		if (e.getActionCommand().equals("Load")) {
+			int result = fc_.showOpenDialog(this);
+			if (result == JFileChooser.APPROVE_OPTION) {
+				File file = fc_.getSelectedFile();
+				fc_.setFileFilter(new CSVFilter());
+				
+				FileReader reader = new FileReader(file);
+				BufferedReader bf = new BufferedReader(reader);
+				
+				
+			}
+		}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
 	/**
 	 * A simple class which compares strings.
@@ -215,10 +246,26 @@ public class ItemBuilder extends JFrame implements ActionListener {
 			return o1.toString().compareTo(o2.toString());
 		}
 	}
+	
+	private class CSVFilter extends FileFilter {
+		private static final String ITEMFILE_EXTENSION = "csv";
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
+		@Override
+		public boolean accept(File pathname) {
+			if (pathname.isDirectory())
+				return true;
+			
+			String filename = pathname.getName();
+			String extension = filename.substring(filename.lastIndexOf('.'));
+			if (extension.equals(ITEMFILE_EXTENSION))
+				return true;
+			return false;
+		}
+
+		@Override
+		public String getDescription() {
+			return "Comma-separated item files.";
+		}
 		
 	}
 }
