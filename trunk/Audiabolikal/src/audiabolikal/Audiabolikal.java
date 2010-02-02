@@ -14,6 +14,7 @@ public class Audiabolikal {
 	 * A constructor.
 	 */
 	public Audiabolikal() {
+		
 		initialise();
 		loadResources();
 	}
