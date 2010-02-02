@@ -5,7 +5,7 @@
 
 Here is the item definition page. Of course, the meshes aren't available here, but the file defines all else. The item types have been split up for convenience. Be sure to follow capitalisation and spelling guidelines.
 
-*{{{<Item Type>,"Item Name","genre,genre,...","[RED,60],[WHITE,20],[(0,128,25), 10],...",<Value Mod>,<Base Attack>+<Attack Variance>,<Base Defense>+<Defense Variance>,<Base Hit>+<Hit Variance>,<Base Evasion>+<Evasion Variance>,"<male mesh file>","<female mesh file>","<male texture file>","<female texture file>",<RotationX>,<RotationY>,<RotationZ>,<RotationX>,<ScaleX>,<ScaleY>,<ScaleZ>}}}
+*{{{<Item Type>,"Item Name","genre,genre,...","[RED,60],[WHITE,20],[(0,128,25), 10],...",<Value Mod>,<Base Attack>+<Attack Variance>,<Base Defense>+<Defense Variance>,<Base Hit>+<Hit Variance>,<Base Evasion>+<Evasion Variance>,"<male mesh file>","<female mesh file>","<male texture file>","<female texture file>",<RotationX>,<RotationY>,<RotationZ>,<ScaleX>,<ScaleY>,<ScaleZ>}}}
 ----
 
 == Headgear ==
