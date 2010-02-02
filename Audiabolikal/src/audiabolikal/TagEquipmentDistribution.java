@@ -76,9 +76,9 @@ public class TagEquipmentDistribution {
 				if (i != 0)
 					itemWeight *= tagHierarchy_.getParentWeighting(tag, genre);
 				
-				// If the item already exists in there, add the weights
+				// If the item already exists in there, use the largest weight
 				if (distro.contains(item))
-					distro.set(item, distro.getProb(item) + itemWeight);
+					distro.set(item, Math.max(distro.getProb(item), itemWeight));
 				else
 					distro.add(item, itemWeight);
 			}

@@ -24,6 +24,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 
+import audiabolikal.Parser;
 import audiabolikal.equipment.Item;
 
 /**
@@ -66,7 +67,7 @@ public class ItemBuilder extends JFrame implements ActionListener {
 
 		itemModel_ = new ItemModelPanel(this);
 		add(itemModel_);
-		
+
 		mainMenu_ = new JMenuBar();
 		JMenu main = new JMenu("File");
 		JMenuItem load = new JMenuItem("Load...");
@@ -190,7 +191,8 @@ public class ItemBuilder extends JFrame implements ActionListener {
 	/**
 	 * Adds an item to the total items.
 	 * 
-	 * @param newItem The item being added
+	 * @param newItem
+	 *            The item being added
 	 */
 	public void addItem(Item newItem) {
 		totalItems_.add(newItem);
@@ -202,7 +204,8 @@ public class ItemBuilder extends JFrame implements ActionListener {
 	/**
 	 * Removes an item from the total items.
 	 * 
-	 * @param item The item to be removed.
+	 * @param item
+	 *            The item to be removed.
 	 */
 	public void removeItem(Item item) {
 		if (totalItems_.remove(item))
@@ -210,7 +213,7 @@ public class ItemBuilder extends JFrame implements ActionListener {
 		itemDetails_.loadItemDetails(currentItem_);
 		itemModel_.loadItemDetails(currentItem_);
 	}
-	
+
 	protected JFileChooser getFileChooser() {
 		return fc_;
 	}
@@ -218,21 +221,38 @@ public class ItemBuilder extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-		if (e.getActionCommand().equals("Load")) {
-			int result = fc_.showOpenDialog(this);
-			if (result == JFileChooser.APPROVE_OPTION) {
-				File file = fc_.getSelectedFile();
+			if (e.getActionCommand().equals("Load")) {
 				fc_.setFileFilter(new CSVFilter());
-				
-				FileReader reader = new FileReader(file);
-				BufferedReader bf = new BufferedReader(reader);
-				
-				
+				int result = fc_.showOpenDialog(this);
+				if (result == JFileChooser.APPROVE_OPTION) {
+					File file = fc_.getSelectedFile();
+
+					FileReader reader = new FileReader(file);
+					BufferedReader bf = new BufferedReader(reader);
+
+					String strItem = bf.readLine();
+					if ((strItem != null) && (!strItem.equals(""))) {
+						Item loaded = Parser.parseItem(strItem);
+						addItem(loaded);
+					}
+
+					bf.close();
+					reader.close();
+				}
 			}
-		}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	/**
+	 * Loads an item from string format into the program.
+	 * 
+	 * @param strItem
+	 *            The string representation of the item details.
+	 */
+	private void loadItem(String strItem) {
+		
 	}
 
 	/**
@@ -246,7 +266,7 @@ public class ItemBuilder extends JFrame implements ActionListener {
 			return o1.toString().compareTo(o2.toString());
 		}
 	}
-	
+
 	private class CSVFilter extends FileFilter {
 		private static final String ITEMFILE_EXTENSION = "csv";
 
@@ -254,10 +274,9 @@ public class ItemBuilder extends JFrame implements ActionListener {
 		public boolean accept(File pathname) {
 			if (pathname.isDirectory())
 				return true;
-			
+
 			String filename = pathname.getName();
-			String extension = filename.substring(filename.lastIndexOf('.'));
-			if (extension.equals(ITEMFILE_EXTENSION))
+			if (filename.toLowerCase().endsWith(ITEMFILE_EXTENSION))
 				return true;
 			return false;
 		}
@@ -266,6 +285,6 @@ public class ItemBuilder extends JFrame implements ActionListener {
 		public String getDescription() {
 			return "Comma-separated item files.";
 		}
-		
+
 	}
 }

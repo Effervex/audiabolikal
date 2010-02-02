@@ -90,7 +90,7 @@ public class TagEquipmentDistributionTest {
 		sut_.insertItem(helm);
 		assertEquals(sut_.getProbability("metal", helm), 1d, EPSILON);
 		assertEquals(sut_.getProbability("rock", helm), 0.5d, EPSILON);
-		assertEquals(sut_.getProbability("progressive metal", helm), 0.8 * 1 + 0.2 * 0.5, EPSILON);
+		assertEquals(sut_.getProbability("progressive metal", helm), 0.8, EPSILON);
 		
 		// Overlapping genres
 		genres = new HashMap<String, Double>();
@@ -101,7 +101,7 @@ public class TagEquipmentDistributionTest {
 		sut_.clear();
 		sut_.insertItem(helm);
 		assertEquals(sut_.getProbability("thrash metal", helm), 0.8d, EPSILON);
-		assertEquals(sut_.getProbability("melodic thrash metal", helm), 1.46d, EPSILON);
+		assertEquals(sut_.getProbability("melodic thrash metal", helm), 0.9d, EPSILON);
 	}
 
 	@Test
