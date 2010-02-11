@@ -17,5 +17,7 @@ WikiAttacks
 
 WikiStoryline
 
+WikiAvatar
+
 == Graphics ==
 WikiRepresentation
