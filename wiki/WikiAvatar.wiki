@@ -1,0 +1,24 @@
+#summary Description of the avatar which helps/represents the user.
+
+= Introduction =
+
+In most TRPGs, the user communicates with the enemy/story with an avatar or main character/s. The Audiabolikal avatar can, like the rest of the game, be generated from the music the user listens to.
+
+
+= Main Appearance =
+
+The appearance of the avatar of the game is defined by what music the user queries into the soldier making algorithm. Like the soldiers of the game, the appearance can be generated from a group of distributions, including colour.
+
+Basically the avatar's appearance is initially blank (well a very blank, plain looking model), and with each X songs evaluated, the appearance is updated, based on the tags of the songs. Therefore the appearance is a result of the percent of tags evaluated. The appearance is fixed for those X songs as well.
+
+But we can also use the number of songs evaluated to determine the scale of the appearance. For instance, say 'metal' makes the avatar have horns, with only a sample size of 10 songs, the horns are only small buds, but after say 1000 songs (each of which are metal), the horns are mighty and demonic.
+
+An avatar's appearance is made up of more than just a static face though. There can be a number of facial expressions for expressing themselves also. Anime expressions are typically good enough for these expressions.
+
+Also, if a user evaluates say, 70% metal and 30% rock, then the appearance will be roughly equal to that distribution (assuming the sampler samples that proportion).
+
+==Mannerisms==
+
+The way the avatar talks can also be made up of genres. Assuming words in a sentence can be chopped and changed with genre-specific keywords, this can be done relatively easily.
+
+Failing that, whole sentences of dialog can be set to the majority genre.
