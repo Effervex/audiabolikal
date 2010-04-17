@@ -8,4 +8,17 @@ The gameplay of Audiabolikal is the key feature of how fun the game is. Sure, th
 = Main Menu/Start Page =
 
 
+= Battle Gameplay =
+
+The battle gameplay will stick closely to the typical TRPG standard, with individual unit commands issued and run per each player turn. Whether this is done in a unit-by-unit basis (so using speed attribute, like FF:Tactics) or on a player-by-player turn basis (like Disgaea, where all units are moved in one turn) is still unsure. I think perhaps a player-by-player turn basis works better, as it opens the possibility of combos.
+
+Where Disgaea, FF:Tactics, Tactics Ogre, and others have an anime-type appearance, this game could deviate by using 3D models with a similar design to Torchlight (3D cartoonish appearance).
+
+Furthermore, by releasing the confines of 2D design, the levels could be freed of grid-based design, such that soldiers can be placed almost anywhere. This, of course creates problems as well, such as distance calculations, height problems, and the possibility of being stuck in geometry. However, by releasing the strict 2D confines, physics can be employed which affect unit attacks and opponent placement after a push-back attack.
+
+For example, if a unit was hit with a particularly forceful attack, it could fall backwards, possibly from a height or into a wall, which can cause extra dynamic damage.
+
+The jMonkey (or whatever it was called) package contains some physics classes which could be employed, and perhaps some basic rag-doll can be implemented.
+
+
 = Jukebox =
