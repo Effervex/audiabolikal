@@ -1,0 +1,22 @@
+#summary The terrain generation page.
+
+= Introduction =
+
+The terrain generation is comprised of 2 steps: determine the geography of the level, then add features to the level.
+
+The size of the level itself is just a Gaussian distributed square. This is determined before the georgraphy is determined.
+
+The 'look' of the level is determined by the genre/theme, hence the same level can have a different look based on what theme it is using. To properly texture the level, each generated level has texture areas which can be specially textured with defined textures (road, rough, water, etc).
+
+For example, one texture could be in a city, where the building features are stone buildings, and the columns are stone columns; and another texture could be country, where buildings are straw and columns are tree trunks.
+
+
+= Generate Geography =
+
+There are a number of different geography types, each defining the base layout of the level. The geography is just selected from a random number (seeded).
+
+The geography also has some extra attributes that affect all geography types:
+* Bumpiness The 'roughness' of the terrain (so a Plain will become more bumpy)
+
+
+== Plains ==
