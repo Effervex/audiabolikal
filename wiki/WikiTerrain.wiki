@@ -10,6 +10,9 @@ The 'look' of the level is determined by the genre/theme, hence the same level c
 
 For example, one texture could be in a city, where the building features are stone buildings, and the columns are stone columns; and another texture could be country, where buildings are straw and columns are tree trunks.
 
+== Terrain Notes ==
+Each terrain square is enough to hold one person (say, 1.5 metres)and the height of each tile is 50 cm (so 4 are about the height of a soldier).
+
 
 = Generate Geography =
 
