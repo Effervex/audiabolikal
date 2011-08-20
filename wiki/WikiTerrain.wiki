@@ -16,7 +16,55 @@ For example, one texture could be in a city, where the building features are sto
 There are a number of different geography types, each defining the base layout of the level. The geography is just selected from a random number (seeded).
 
 The geography also has some extra attributes that affect all geography types:
-* Bumpiness The 'roughness' of the terrain (so a Plain will become more bumpy)
-
+ * Bumpiness The 'roughness' of the terrain (so a Plain will become more bumpy)
+ * Water height: The height of the water (bounded such that a level can be traversed)
 
 == Plains ==
+A flat level. Only bumpiness can affect it.
+
+== Slope ==
+A sloped level. The direction and grade of the slope are randomly determined. Also can have rotation about the line of the slope.
+
+== Valley ==
+A valley (2 slopes). Has the same attributes as a slope as well as the size of the valley at each end.
+
+== Ridge ==
+The opposite of a valley. Has the same attributes as a valley.
+
+== Cliff ==
+A cliff is special terrain in that the cliff is parallel to the map and bisects part of the map fully, such that the cliff is a sheer(ish) drop, but players can get to the top of the cliff through some path(s).
+
+== Islands ==
+Islands are a number of raised mounds scattered throughout the map. The map doesn't necessarily have to have water.
+
+
+= Add Features =
+
+A number of features can be added to the map to 'spice' it up. Some features are only minor objects to be added, others are full map changes. Some features may block other features.
+
+== Arch ==
+A basic, mostly aesthetic feature which just inserts an arch into the map over road textures, or elsewhere.
+
+== Bridge ==
+A bridge running over a sizeable drop in the terrain to another point of roughly equal height (hence bridges will not exist in plains).
+
+== Building ==
+A building placed in the map of variable size and height. Buildings are mainly placed by roads.
+
+== Column/Tree ==
+A tall straight column of variable radius.
+
+== Crater ==
+A hole placed in the ground of variable size.
+
+== Forest ==
+A full-map feature of multiple columns in variable density and placement.
+
+== Mound ==
+A mound placed on the ground of variable size.
+
+== River ==
+A full-map river which runs through the map, generally sticking the existing terrain valleys.
+
+== Wall ==
+A wall of variable width and length running across the map. Walls may crumble and are always climbable.
