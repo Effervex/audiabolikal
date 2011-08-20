@@ -29,7 +29,7 @@ A flat level. Only bumpiness can affect it.
 A sloped level. The direction and grade of the slope are randomly determined. Also can have rotation about the line of the slope.
 
 == Valley ==
-A valley (2 slopes). Has the same attributes as a slope as well as the size of the valley at each end.
+A valley (2 slopes). Has the same attributes as a slope as well as the size of the valley at the start, middle and end.
 
 == Ridge ==
 The opposite of a valley. Has the same attributes as a valley.
