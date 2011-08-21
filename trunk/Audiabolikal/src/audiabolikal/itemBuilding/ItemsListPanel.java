@@ -88,10 +88,10 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 		listPanel.add(listScroll, BorderLayout.CENTER);
 
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(ItemBuilder.createButton("Add Item", this));
-		buttonPanel.add(ItemBuilder.createButton("Copy Item", this));
-		buttonPanel.add(ItemBuilder.createButton("Remove Item", this));
-		
+		JButton addItem = ItemBuilder.createButton("Add Item", this);
+		buttonPanel.add(addItem);
+		JButton removeItem = ItemBuilder.createButton("Remove Item", this);
+		buttonPanel.add(removeItem);
 		listPanel.add(buttonPanel, BorderLayout.SOUTH);
 		add(listPanel, BorderLayout.CENTER);
 
@@ -240,18 +240,10 @@ public class ItemsListPanel extends JPanel implements ActionListener,
 			// Add the item to the list and select it, loading up the
 			// information in the detail panel.
 			setSelectedItem(newItem);
+			// valueChanged(null);
 		} else if (e.getActionCommand().equals("Remove Item")) {
 			parentFrame_.removeItem((Item) itemsList_.getSelectedValue());
 			updateListPanel();
-		} else if (e.getActionCommand().equals("Copy Item")) {
-			Item selected = (Item) itemsList_.getSelectedValue();
-			if (selected != null) {
-				Item copy = selected.cloneGeneral();
-				copy.setName("Copy of " + copy.getName());
-				
-				parentFrame_.addItem(copy);
-				setSelectedItem(copy);
-			}
 		} else {
 			updateListPanel();
 		}

@@ -10,16 +10,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -30,6 +29,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -128,10 +128,9 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 
 		// Colours list
 		add(new JLabel("Colours:"), "1, 11");
-		model = new ColourTableModel(new Object[] { "Colour", "Value" }, 0);
+		model = new DefaultTableModel(new Object[] { "Colour", "Value" }, 0);
 		colourTable_ = new JTable(model);
 		colourTable_.setPreferredScrollableViewportSize(new Dimension(10, 50));
-		colourTable_.setDefaultRenderer(Color.class, new ColorRenderer(true));
 		JScrollPane colourScroller = new JScrollPane(colourTable_);
 		add(colourScroller, "1, 12, 4, 12, f, f");
 		add(ItemBuilder.createButton("Add Colour", this), "1,13,2,13,c,c");
@@ -232,39 +231,7 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 			varianceSpn_[1].setValue(item.getDefenseVariance());
 			varianceSpn_[2].setValue(item.getHitVariance());
 			varianceSpn_[3].setValue(item.getEvasionVariance());
-			valueModFld_.setText(item.getValueMod() + "");
 			updateAttribsStats();
-
-			DefaultTableModel model = (DefaultTableModel) genreTable_
-					.getModel();
-			model.setNumRows(0);
-			for (String genre : item.getGenres()) {
-				model
-						.addRow(new Object[] { genre,
-								item.getGenreWeight(genre) });
-			}
-
-			model = (ColourTableModel) colourTable_.getModel();
-			model.setNumRows(0);
-			for (Color color : item.getColorDistribution()) {
-				model.addRow(new Object[] { color,
-						item.getColorDistribution().getProb(color) });
-			}
-			
-			maleMeshFld_.setText(item.getMaleMeshFile() + "");
-			maleTextureFld_.setText(item.getMaleTextureFile() + "");
-			femaleMeshFld_.setText(item.getFemaleMeshFile() + "");
-			femaleTextureFld_.setText(item.getFemaleTextureFile() + "");
-			
-			float[] rotation = item.getRotation();
-			rotationX_.setText(rotation[0] + "");
-			rotationY_.setText(rotation[1] + "");
-			rotationZ_.setText(rotation[2] + "");
-			
-			float[] scale = item.getScale();
-			scaleX_.setText(scale[0] + "");
-			scaleY_.setText(scale[1] + "");
-			scaleZ_.setText(scale[2] + "");
 		}
 	}
 
@@ -326,7 +293,7 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 	private ProbabilityDistribution<Color> compileColour() {
 		ProbabilityDistribution<Color> colors = new ProbabilityDistribution<Color>();
 
-		ColourTableModel model = (ColourTableModel) colourTable_.getModel();
+		DefaultTableModel model = (DefaultTableModel) genreTable_.getModel();
 
 		// For each genre in the table.
 		for (int y = 0; y < model.getRowCount(); y++) {
@@ -340,11 +307,9 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 
 	/**
 	 * Removes all occurrences from a table from a collection.
-	 * 
-	 * @param table
-	 *            The table.
-	 * @param collection
-	 *            The collection of things.
+	 *  
+	 * @param table The table.
+	 * @param collection The collection of things.
 	 */
 	private void removeExisting(JTable table, Collection<?> collection) {
 		for (int y = 0; y < table.getRowCount(); y++) {
@@ -402,66 +367,15 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 		} else if (e.getActionCommand().equals("Remove Genre")) {
 			int row = genreTable_.getSelectedRow();
 			if (row != -1) {
-				DefaultTableModel model = (DefaultTableModel) genreTable_
-						.getModel();
+				DefaultTableModel model = (DefaultTableModel) genreTable_.getModel();
 				model.removeRow(row);
 			}
 		} else if (e.getActionCommand().equals("Add Colour")) {
-			// Bring up a colour chooer to choose a colour.
-			JDialog dialog = new JDialog(parentFrame_, true);
-			dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-			ColourChooserPanel ccp = new ColourChooserPanel(dialog);
-			dialog.add(ccp);
-			dialog.pack();
-			dialog.setVisible(true);
 
-			Color chosenColour = ccp.getChosenColour();
-			if (chosenColour == null)
-				return;
-
-			// Get the weight value
-			Double value = -1.0;
-			while ((value <= 0) || (value > 1)) {
-				String weight = JOptionPane.showInputDialog(parentFrame_,
-						"Weighting for '" + chosenColour + "' (0.1-1.0):",
-						"Genre Weighting", JOptionPane.PLAIN_MESSAGE);
-				if (weight == null)
-					return;
-				try {
-					value = Double.parseDouble(weight);
-				} catch (Exception ex) {
-				}
-			}
-
-			DefaultTableModel model = (DefaultTableModel) colourTable_
-					.getModel();
-			model.addRow(new Object[] { chosenColour, value });
 		} else if (e.getActionCommand().equals("Remove Colour")) {
-			int row = colourTable_.getSelectedRow();
-			if (row != -1) {
-				DefaultTableModel model = (DefaultTableModel) colourTable_
-						.getModel();
-				model.removeRow(row);
-			}
-		} else if (e.getActionCommand().equals("Jiggle Attributes")) {
-			double jiggleAmount = ATTRIBS_TOTAL / 15.0;
-			Random random = new Random();
-			for (int i = 0; i < attribsSpn_.length; i++) {
-				// Attribute
-				SpinnerNumberModel model = (SpinnerNumberModel) attribsSpn_[i]
-						.getModel();
-				double value = model.getNumber().doubleValue();
-				value += Math.max(0,
-						(int) (random.nextGaussian() * jiggleAmount));
-				model.setValue(value);
 
-				// Variance
-				model = (SpinnerNumberModel) varianceSpn_[i].getModel();
-				value = model.getNumber().doubleValue();
-				value += Math.max(0, (int) (random.nextGaussian()
-						* jiggleAmount * 0.5));
-				model.setValue(value);
-			}
+		} else if (e.getActionCommand().equals("Jiggle Attributes")) {
+
 		}
 	}
 
@@ -479,20 +393,5 @@ public class ItemDetailsPanel extends JPanel implements ActionListener,
 	@Override
 	public void stateChanged(ChangeEvent arg0) {
 		updateAttribsStats();
-	}
-
-	public class ColourTableModel extends DefaultTableModel {
-		public ColourTableModel(Object[] columnNames, int rows) {
-			super(columnNames, rows);
-		}
-
-		public Class<?> getColumnClass(int column) {
-			if (column == 0) {
-				return Color.class;
-			} else if (column == 1) {
-				return String.class;
-			}
-			return null;
-		}
 	}
 }
