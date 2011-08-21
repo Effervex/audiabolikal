@@ -2,7 +2,6 @@ package audiabolikal.equipment;
 
 import java.awt.Color;
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -176,7 +175,6 @@ public abstract class Item {
 		name_ = name;
 		genres_ = genres;
 		colourDistribution_ = itemColors;
-		colourDistribution_.normaliseProbs();
 		baseValue_ = valueMod;
 		baseAttack_ = baseAttack;
 		baseDefense_ = baseDefense;
@@ -647,99 +645,6 @@ public abstract class Item {
 		return className_;
 	}
 
-	public Color getColor() {
-		return colour_;
-	}
-
-	public ProbabilityDistribution<Color> getColorDistribution() {
-		return colourDistribution_;
-	}
-
-	/**
-	 * @return the maleMeshFile_
-	 */
-	public File getMaleMeshFile() {
-		return maleMeshFile_;
-	}
-
-	/**
-	 * @return the femaleMeshFile_
-	 */
-	public File getFemaleMeshFile() {
-		return femaleMeshFile_;
-	}
-
-	/**
-	 * @return the maleTextureFile_
-	 */
-	public File getMaleTextureFile() {
-		return maleTextureFile_;
-	}
-
-	/**
-	 * @return the femaleTextureFile_
-	 */
-	public File getFemaleTextureFile() {
-		return femaleTextureFile_;
-	}
-
-	/**
-	 * @return the rotation_
-	 */
-	public float[] getRotation() {
-		return rotation_;
-	}
-
-	/**
-	 * @return the scale_
-	 */
-	public float[] getScale() {
-		return scale_;
-	}
-
-	/**
-	 * Clones a general item mould.
-	 * 
-	 * @return A clone of the item.
-	 */
-	public Item cloneGeneral() {
-		try {
-			Item clone = this.getClass().newInstance();
-			String name = name_;
-			Map<String, Double> genres = new HashMap<String, Double>(genres_);
-			ProbabilityDistribution<Color> itemColors = colourDistribution_.clone();
-			float valueMod = baseValue_;
-			float baseAttack = baseAttack_;
-			float attackVariance = attackVariance_;
-			float baseDefense = baseDefense_;
-			float defenseVariance = defenseVariance_;
-			float baseHit = baseHit_;
-			float hitVariance = hitVariance_;
-			float baseEvasion = baseEvasion_;
-			float evasionVariance = evasionVariance_;
-			File maleMeshFile = maleMeshFile_;
-			File maleTextureFile = maleTextureFile_;
-			File femaleMeshFile = femaleMeshFile_;
-			File femaleTextureFile = femaleTextureFile_;
-			float rotationX = rotation_[0];
-			float rotationY = rotation_[1];
-			float rotationZ = rotation_[2];
-			float scaleX = scale_[0];
-			float scaleY = scale_[1];
-			float scaleZ = scale_[2];
-			clone.initialiseMouldItem(name, genres, itemColors, valueMod,
-					baseAttack, attackVariance, baseDefense, defenseVariance,
-					baseHit, hitVariance, baseEvasion, evasionVariance,
-					maleMeshFile, femaleMeshFile, maleTextureFile,
-					femaleTextureFile, rotationX, rotationY, rotationZ, scaleX,
-					scaleY, scaleZ);
-			return clone;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -918,10 +823,6 @@ public abstract class Item {
 			buffer.append("EVA: " + (int) Math.round(evasion_));
 		}
 		return buffer.toString();
-	}
-
-	public void setName(String string) {
-		name_ = string;
 	}
 
 }

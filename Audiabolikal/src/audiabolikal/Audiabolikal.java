@@ -1,12 +1,14 @@
 package audiabolikal;
 
+import com.jme3.app.Application;
+
 /**
  * The main launch class, which handles the global running of the game. From
  * menu, to options, to new games, etc.
  * 
  * @author Samuel J. Sarjant
  */
-public class Audiabolikal {
+public class Audiabolikal extends Application {
 	/** The resources directory. */
 	public static final String RESOURCE_DIR = "resources/";
 
@@ -14,7 +16,6 @@ public class Audiabolikal {
 	 * A constructor.
 	 */
 	public Audiabolikal() {
-		
 		initialise();
 		loadResources();
 	}
@@ -35,6 +36,14 @@ public class Audiabolikal {
 	}
 
 	/**
+	 * Runs the game.
+	 */
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
 	 * Main method.
 	 * 
 	 * @param args
@@ -42,5 +51,6 @@ public class Audiabolikal {
 	 */
 	public static void main(String[] args) {
 		Audiabolikal audiabolikal = new Audiabolikal();
+		audiabolikal.run();
 	}
 }

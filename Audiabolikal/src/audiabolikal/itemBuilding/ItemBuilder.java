@@ -5,26 +5,16 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
 
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.filechooser.FileFilter;
 
-import audiabolikal.Parser;
 import audiabolikal.equipment.Item;
 
 /**
@@ -32,7 +22,7 @@ import audiabolikal.equipment.Item;
  * 
  * @author Samuel J. Sarjant
  */
-public class ItemBuilder extends JFrame implements ActionListener {
+public class ItemBuilder extends JFrame {
 	public static final int GAP_SIZE = 5;
 	public static final int BORDER = 10;
 	protected ItemsListPanel itemsList_;
@@ -40,12 +30,9 @@ public class ItemBuilder extends JFrame implements ActionListener {
 	protected ItemModelPanel itemModel_;
 	private Item currentItem_;
 	private Collection<Item> totalItems_;
-	private JMenuBar mainMenu_;
-	JFileChooser fc_;
 
 	public ItemBuilder() {
 		totalItems_ = new TreeSet<Item>(new ListNameComparator<Item>());
-		fc_ = new JFileChooser();
 		initialise();
 		pack();
 		setVisible(true);
@@ -67,19 +54,6 @@ public class ItemBuilder extends JFrame implements ActionListener {
 
 		itemModel_ = new ItemModelPanel(this);
 		add(itemModel_);
-
-		mainMenu_ = new JMenuBar();
-		JMenu main = new JMenu("File");
-		JMenuItem load = new JMenuItem("Load...");
-		load.setActionCommand("Load");
-		load.addActionListener(this);
-		JMenuItem save = new JMenuItem("Save...");
-		save.setActionCommand("Save");
-		save.addActionListener(this);
-		main.add(load);
-		main.add(save);
-		mainMenu_.add(main);
-		setJMenuBar(mainMenu_);
 	}
 
 	public static void main(String[] args) {
@@ -191,8 +165,7 @@ public class ItemBuilder extends JFrame implements ActionListener {
 	/**
 	 * Adds an item to the total items.
 	 * 
-	 * @param newItem
-	 *            The item being added
+	 * @param newItem The item being added
 	 */
 	public void addItem(Item newItem) {
 		totalItems_.add(newItem);
@@ -204,55 +177,13 @@ public class ItemBuilder extends JFrame implements ActionListener {
 	/**
 	 * Removes an item from the total items.
 	 * 
-	 * @param item
-	 *            The item to be removed.
+	 * @param item The item to be removed.
 	 */
 	public void removeItem(Item item) {
 		if (totalItems_.remove(item))
 			currentItem_ = null;
 		itemDetails_.loadItemDetails(currentItem_);
 		itemModel_.loadItemDetails(currentItem_);
-	}
-
-	protected JFileChooser getFileChooser() {
-		return fc_;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		try {
-			if (e.getActionCommand().equals("Load")) {
-				fc_.setFileFilter(new CSVFilter());
-				int result = fc_.showOpenDialog(this);
-				if (result == JFileChooser.APPROVE_OPTION) {
-					File file = fc_.getSelectedFile();
-
-					FileReader reader = new FileReader(file);
-					BufferedReader bf = new BufferedReader(reader);
-
-					String strItem = bf.readLine();
-					if ((strItem != null) && (!strItem.equals(""))) {
-						Item loaded = Parser.parseItem(strItem);
-						addItem(loaded);
-					}
-
-					bf.close();
-					reader.close();
-				}
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	/**
-	 * Loads an item from string format into the program.
-	 * 
-	 * @param strItem
-	 *            The string representation of the item details.
-	 */
-	private void loadItem(String strItem) {
-		
 	}
 
 	/**
@@ -265,26 +196,5 @@ public class ItemBuilder extends JFrame implements ActionListener {
 		public int compare(T o1, T o2) {
 			return o1.toString().compareTo(o2.toString());
 		}
-	}
-
-	private class CSVFilter extends FileFilter {
-		private static final String ITEMFILE_EXTENSION = "csv";
-
-		@Override
-		public boolean accept(File pathname) {
-			if (pathname.isDirectory())
-				return true;
-
-			String filename = pathname.getName();
-			if (filename.toLowerCase().endsWith(ITEMFILE_EXTENSION))
-				return true;
-			return false;
-		}
-
-		@Override
-		public String getDescription() {
-			return "Comma-separated item files.";
-		}
-
 	}
 }
