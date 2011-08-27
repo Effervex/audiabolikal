@@ -82,16 +82,6 @@ public class ItemTest {
 	}
 
 	@Test
-	public void testGetGenres() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetValue() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	public void testGenerateDescriptor() {
 		// No variance
 		assertEquals("Ordinary", Item.generateDescriptor(40, 20, 0, 0,
