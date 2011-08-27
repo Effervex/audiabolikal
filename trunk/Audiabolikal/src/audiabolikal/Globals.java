@@ -52,8 +52,8 @@ public class Globals {
 		Vector2f intersect = lineOrigin.add(lineDir.mult(u));
 		float dist = point.distance(intersect);
 
-		float v = (point.x - lineOrigin.x) * (lineDir.x)
-				- (point.y - lineOrigin.y) * (lineDir.y);
+		float v = (point.x - lineOrigin.x) * (lineDir.y)
+				- (point.y - lineOrigin.y) * (lineDir.x);
 		if (v < 0)
 			return -dist;
 		else

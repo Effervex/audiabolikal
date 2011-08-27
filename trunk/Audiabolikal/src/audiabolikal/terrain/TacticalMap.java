@@ -227,11 +227,15 @@ public class TacticalMap {
 	private int generateValleyRidge(TerrainGeography type, int sizeX,
 			int sizeZ, Vector2f midMap, int[][] terrain) {
 		// Valley/Ridge sizes
+		Vector2f[] valleyPoints = new Vector2f[VALLEY_POINTS];
 		double[] valleyWidths = new double[VALLEY_POINTS];
 		double[] slopeAngle = new double[VALLEY_POINTS * 2];
 		double[] slopeCurves = new double[VALLEY_POINTS * 2];
 		// Valley direction
 		float[] valleyDirection = new float[VALLEY_POINTS];
+		int valleyRidgeCoeff = (type == TerrainGeography.VALLEY) ? 1 : -1;
+		Vector2f pointLength = new Vector2f(sizeX * 1f / (VALLEY_POINTS - 1),
+				sizeZ * 1f / (VALLEY_POINTS - 1));
 
 		// Initialise the valley points.
 		for (int i = 0; i < VALLEY_POINTS; i++) {
@@ -245,35 +249,45 @@ public class TacticalMap {
 					* SLOPE_CURVE_EXP_SD;
 			slopeCurves[i * 2 + 1] = 1 + Math.abs(Globals.randomGaussian())
 					* SLOPE_CURVE_EXP_SD;
+			
 			// Curving valley
-			if (i == 0)
+			valleyPoints[i] = new Vector2f(pointLength);
+			valleyPoints[i].rotateAroundOrigin(valleyDirection[i], true);
+			valleyPoints[i].subtractLocal(pointLength);
+			if (i == 0) {
 				valleyDirection[i] = (float) (Math.PI * 2 * Globals.random_
 						.nextDouble());
-			else
+			} else {
 				valleyDirection[i] = (float) (valleyDirection[i - 1] + (Globals.random_
 						.nextDouble() - .5) * VALLEY_CURVE_MAX * 2);
+				valleyPoints[i].addLocal(valleyPoints[i - 1]);
+			}
 		}
 
-//		int minValue = Integer.MAX_VALUE;
-//		for (int x = 0; x < sizeX; x++) {
-//			for (int z = 0; z < sizeZ; z++) {
-//				float distFromOrigin = Globals.distance(slopeOrigin.x,
-//						slopeOrigin.y, x, z) - distBuffer;
-//				double curveAngle = slopeAngle
-//						* Math.pow(slopeCurve, distFromOrigin);
-//				int coeff = (decreasing) ? 1 : -1;
-//				terrain[x][z] = (int) (coeff * Math.tan(curveAngle)
-//						* (distFromOrigin) / TILE_RATIO);
-//
-//				// Adjust the roll
-//				float distFromLine = Globals.pointLineDist2f(
-//						new Vector2f(x, z), slopeOrigin, slopeLine);
-//				terrain[x][z] += (int) (Math.tan(slopeRoll) * distFromLine);
-//
-//				// Update the minValue
-//				minValue = Math.min(minValue, terrain[x][z]);
-//			}
-//		}
+		// Create the valley/ridge
+		// int minValue = Integer.MAX_VALUE;
+		// for (int x = 0; x < sizeX; x++) {
+		// for (int z = 0; z < sizeZ; z++) {
+		// // First determine which points to integrate slope between
+		// int slopeOrigin = determineSlopeOrigin()
+		//
+		// float distFromOrigin = Globals.distance(slopeOrigin.x,
+		// slopeOrigin.y, x, z) - distBuffer;
+		// double curveAngle = slopeAngle
+		// * Math.pow(slopeCurve, distFromOrigin);
+		// int coeff = (decreasing) ? 1 : -1;
+		// terrain[x][z] = (int) (coeff * Math.tan(curveAngle)
+		// * (distFromOrigin) / TILE_RATIO);
+		//
+		// // Adjust the roll
+		// float distFromLine = Globals.pointLineDist2f(
+		// new Vector2f(x, z), slopeOrigin, slopeLine);
+		// terrain[x][z] += (int) (Math.tan(slopeRoll) * distFromLine);
+		//
+		// // Update the minValue
+		// minValue = Math.min(minValue, terrain[x][z]);
+		// }
+		// }
 
 		return 0;
 	}
@@ -311,8 +325,8 @@ public class TacticalMap {
 		Vector2f slopeOrigin = originBuffer.add(midMap);
 		slopeOrigin.rotateAroundOrigin(slopeDirection, true);
 		slopeOrigin.addLocal(sizeX / 2, sizeZ / 2);
-		Vector2f slopeLine = new Vector2f(Globals.random_.nextFloat() * sizeX, Globals.random_.nextFloat() * sizeZ)
-				.subtract(slopeOrigin);
+		Vector2f slopeLine = new Vector2f(Globals.random_.nextFloat() * sizeX,
+				Globals.random_.nextFloat() * sizeZ).subtract(slopeOrigin);
 		double slopeRoll = Globals.randomGaussian() * SLOPE_ROLL_SD;
 
 		int minValue = Integer.MAX_VALUE;
