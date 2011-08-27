@@ -9,11 +9,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
-
 import audiabolikal.attacking.Attack;
 import audiabolikal.equipment.Item;
 import audiabolikal.util.ProbabilityDistribution;
@@ -53,13 +48,11 @@ public class Parser {
 	 *            The song file, from which a soldier is created.
 	 * @return A newly created Soldier, determined by the file artist's tags.
 	 */
-	public static Soldier parseSoldier(File songFile) throws Exception {
+	public static Soldier parseSoldier(Song song) throws Exception {
 		// First, read the songFile data
-		AudioFile af = AudioFileIO.read(songFile);
-
-		Tag fileTag = af.getTag();
-		String artist = fileTag.getFirst(FieldKey.ARTIST);
-		String title = fileTag.getFirst(FieldKey.TITLE);
+		ID3Info id3 = song.getID3Info();
+		String artist = id3.getArtist();
+		String title = id3.getTitle();
 
 		// Gets the tags from Last.fm regarding the artist.
 		List<net.roarsoftware.lastfm.Tag> trackTags = Track.getTopTags(artist,
@@ -89,7 +82,7 @@ public class Parser {
 	 *            The audio file which creates the attack.
 	 * @return An attack, created from the data within the file.
 	 */
-	public static Attack parseAttack(AudioFile songFile) {
+	public static Attack parseAttack(Song song) {
 		return null;
 	}
 
@@ -124,8 +117,8 @@ public class Parser {
 		Map<String, Double> genres = new HashMap<String, Double>();
 		for (String genreWeight : genresSplit) {
 			int colonIndex = genreWeight.indexOf(':');
-			genres.put(genreWeight.substring(0, colonIndex), Double
-					.parseDouble(genreWeight.substring(colonIndex + 1)));
+			genres.put(genreWeight.substring(0, colonIndex),
+					Double.parseDouble(genreWeight.substring(colonIndex + 1)));
 		}
 		// Colours
 		m.find();
@@ -134,9 +127,10 @@ public class Parser {
 		String[] coloursSplit = colourString.split(",");
 		for (String colourWeight : coloursSplit) {
 			int colonIndex = colourWeight.indexOf(':');
-			colorDistribution.add(new Color(Integer.parseInt(colourWeight
-					.substring(0, colonIndex))), Double
-					.parseDouble(colourWeight.substring(colonIndex + 1)));
+			colorDistribution.add(
+					new Color(Integer.parseInt(colourWeight.substring(0,
+							colonIndex))), Double.parseDouble(colourWeight
+							.substring(colonIndex + 1)));
 		}
 		// Value Mod
 		m.find();
@@ -193,7 +187,8 @@ public class Parser {
 		scale[2] = Float.parseFloat(m.group(1));
 
 		try {
-			Item item = (Item) Class.forName("audiabolikal.equipment." + type).newInstance();
+			Item item = (Item) Class.forName("audiabolikal.equipment." + type)
+					.newInstance();
 			item.initialiseMouldItem(name, genres, colorDistribution, valueMod,
 					baseAttack, attackVariance, baseDefense, defenseVariance,
 					baseHit, hitVariance, baseEvasion, evasionVariance,
