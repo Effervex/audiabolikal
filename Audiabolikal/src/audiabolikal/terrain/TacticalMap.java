@@ -2,6 +2,7 @@ package audiabolikal.terrain;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
@@ -16,7 +17,9 @@ import audiabolikal.terrain.feature.TerrainFeatureEnum;
  * @author Samuel J. Sarjant
  */
 public class TacticalMap {
-	private static final double BUMPINESS_SD = .4;
+	private static final Vector2f[] DIRECTIONS = { new Vector2f(-1, 0), new Vector2f(1, 0),
+			new Vector2f(0, 1), new Vector2f(0, -1) };
+	private static final float BUMPINESS_SD = .4f;
 	/**
 	 * The number of times a new feature is attempted to be added before giving
 	 * up.
@@ -26,21 +29,24 @@ public class TacticalMap {
 	private static final double FEATURES_PER_AREA_SD = 0.1;
 	private static final int MAP_SIZE_MEAN = 16;
 	private static final int MAP_SIZE_SD = 3;
-	private static final int MAX_BUMP_ORIGINS = 5;
 	private static final float ORIGIN_BUFFER = 250;
 	private static final double SLOPE_CURVE_EXP_SD = .005;
 	private static final double SLOPE_MEAN = Math.PI / 3;
 	private static final double SLOPE_SD = Math.PI / 24;
-	private static final double SLOPE_ROLL_SD = Math.PI / 18;
-	private static final double VALLEY_SIZE_MEAN = .3;
-	private static final double VALLEY_SIZE_SD = .25;
+	private static final double SLOPE_ROLL_SD = Math.PI / 6;
+	private static final double VALLEY_SIZE_MEAN = .2;
+	private static final double VALLEY_SIZE_SD = .15;
 	private static final double VALLEY_CURVE_MAX = Math.PI / 6;
 	private static final double WATER_LEVEL_MEAN = -2;
 	private static final double WATER_LEVEL_SD = 2;
+	private static final double ISLAND_HEIGHT_MEAN = 7;
+	private static final double ISLAND_HEIGHT_SD = 1.5;
 	/** The ratio of tile size to tile height. */
 	public static final float TILE_RATIO = 3;
 	/** The points in the valley to generate new slopes for [1-4]. */
-	private static final int VALLEY_POINTS = 2;
+	private static final int MAX_VALLEY_POINTS = 6;
+	private static final float MIN_ISLANDS = .15f;
+	private static final float MAX_ISLANDS = .25f;
 
 	/** The features of the terrain. */
 	private TerrainFeature[] features_;
@@ -94,12 +100,52 @@ public class TacticalMap {
 	 * @param sizeZ
 	 *            The z size.
 	 * @param bumpiness
-	 *            The bumpiness shift for each square from the origin.
+	 *            The average bumpiness shift for each square from the origin.
 	 */
-	private void applyBumpiness(int[][] terrain, int sizeX, int sizeZ,
-			double bumpiness) {
-		// TODO Auto-generated method stub
+	private int applyBumpiness(int[][] terrain, int sizeX, int sizeZ,
+			float bumpiness) {
+		Vector2f origin = new Vector2f(Globals.random_.nextInt(sizeX),
+				Globals.random_.nextInt(sizeZ));
+		LinkedList<Vector2f> points = new LinkedList<Vector2f>();
+		points.add(origin);
+		Float[][] bumpMap = new Float[sizeX][sizeZ];
 
+		// Loop through every point.
+		while (!points.isEmpty()) {
+			Vector2f point = points.pop();
+			// Note neighbour values and add neighbours to the points.
+			float average = 0;
+			int numAdjacent = 0;
+			for (Vector2f dir : DIRECTIONS) {
+				Vector2f adjacent = point.add(dir);
+				if (adjacent.x >= 0 && adjacent.x < sizeX && adjacent.y >= 0
+						&& adjacent.y < sizeZ) {
+					if (bumpMap[(int) adjacent.x][(int) adjacent.y] == null) {
+						if (!points.contains(adjacent))
+							points.add(adjacent);
+					} else {
+						average += bumpMap[(int) adjacent.x][(int) adjacent.y];
+						numAdjacent++;
+					}
+				}
+			}
+
+			// Apply the bumpiness
+			if (numAdjacent > 0)
+				average /= numAdjacent;
+			bumpMap[(int) point.x][(int) point.y] = average
+					+ Globals.randomCoeff() * bumpiness;
+		}
+
+		// Apply the bumpiness to the terrain.
+		int minValue = Integer.MAX_VALUE;
+		for (int x = 0; x < sizeX; x++) {
+			for (int z = 0; z < sizeZ; z++) {
+				terrain[x][z] += Math.round(bumpMap[x][z]);
+				minValue = Math.min(terrain[x][z], minValue);
+			}
+		}
+		return minValue;
 	}
 
 	/**
@@ -189,11 +235,14 @@ public class TacticalMap {
 			lowestPoint_ = generateValleyRidge(TerrainGeography.RIDGE, sizeX,
 					sizeZ, midMap, terrain);
 			break;
+		case ISLANDS:
+			lowestPoint_ = generateIslands(sizeX, sizeZ, terrain);
 		}
 
 		// Determine the bumpiness
-		double bumpiness = Globals.randomGaussian() * BUMPINESS_SD;
-		applyBumpiness(terrain, sizeX, sizeZ, bumpiness);
+		float bumpiness = Globals.randomGaussian() * BUMPINESS_SD;
+		lowestPoint_ = Math.min(lowestPoint_,
+				applyBumpiness(terrain, sizeX, sizeZ, bumpiness));
 		// Water level
 		int waterLevel = lowestPoint_
 				+ (int) (WATER_LEVEL_MEAN + Globals.randomGaussian()
@@ -207,6 +256,59 @@ public class TacticalMap {
 		checkTerrain(terrain, lowestPoint_);
 
 		return terrain;
+	}
+
+	/**
+	 * Generates a cluster of islands of variable height, shape and location
+	 * 
+	 * @param sizeX
+	 *            The level x size.
+	 * @param sizeZ
+	 *            The level z size.
+	 * @param terrain
+	 *            The terrain to fill.
+	 * @return The minimum value of the terrain.
+	 */
+	private int generateIslands(int sizeX, int sizeZ, int[][] terrain) {
+		int numIslands = (int) ((sizeX + sizeZ) / 2 * MIN_ISLANDS + Globals.random_
+				.nextFloat() * (MAX_ISLANDS - MIN_ISLANDS));
+
+		// Generate different island points, building them up like bumpiness is
+		// built by using a queue of points. Cease building if the landmass
+		// drops below a given point.
+		for (int i = 0; i < numIslands; i++) {
+			LinkedList<Vector2f> points = new LinkedList<Vector2f>();
+			Vector2f origin = new Vector2f(Globals.random_.nextInt(sizeX),
+					Globals.random_.nextInt(sizeZ));
+			points.add(origin);
+			// Continue to update terrain while height is above previous value.
+			while (!points.isEmpty()) {
+				Vector2f point = points.pop();
+				// Note neighbour values and add neighbours to the points.
+				float average = 0;
+				int numAdjacent = 0;
+				for (Vector2f dir : DIRECTIONS) {
+					Vector2f adjacent = point.add(dir);
+					if (adjacent.x >= 0 && adjacent.x < sizeX && adjacent.y >= 0
+							&& adjacent.y < sizeZ) {
+						if (bumpMap[(int) adjacent.x][(int) adjacent.y] == null) {
+							if (!points.contains(adjacent))
+								points.add(adjacent);
+						} else {
+							average += bumpMap[(int) adjacent.x][(int) adjacent.y];
+							numAdjacent++;
+						}
+					}
+				}
+
+				// Apply the bumpiness
+				if (numAdjacent > 0)
+					average /= numAdjacent;
+				bumpMap[(int) point.x][(int) point.y] = average
+						+ Globals.randomCoeff() * bumpiness;
+			}
+		}
+		return 0;
 	}
 
 	/**
@@ -227,69 +329,125 @@ public class TacticalMap {
 	private int generateValleyRidge(TerrainGeography type, int sizeX,
 			int sizeZ, Vector2f midMap, int[][] terrain) {
 		// Valley/Ridge sizes
-		Vector2f[] valleyPoints = new Vector2f[VALLEY_POINTS];
-		double[] valleyWidths = new double[VALLEY_POINTS];
-		double[] slopeAngle = new double[VALLEY_POINTS * 2];
-		double[] slopeCurves = new double[VALLEY_POINTS * 2];
+		int numValleyPoints = Globals.random_.nextInt(MAX_VALLEY_POINTS - 1) + 2;
+		Vector2f[] valleyPoints = new Vector2f[numValleyPoints];
+		float[] valleyWidths = new float[numValleyPoints];
+		float[] slopeAngle = new float[numValleyPoints * 2];
+		float[] slopeCurves = new float[numValleyPoints * 2];
 		// Valley direction
-		float[] valleyDirection = new float[VALLEY_POINTS];
+		float[] valleyDirection = new float[numValleyPoints];
 		int valleyRidgeCoeff = (type == TerrainGeography.VALLEY) ? 1 : -1;
-		Vector2f pointLength = new Vector2f(sizeX * 1f / (VALLEY_POINTS - 1),
-				sizeZ * 1f / (VALLEY_POINTS - 1));
+		Vector2f pointLength = new Vector2f(sizeX * 1f / (numValleyPoints - 1),
+				sizeZ * 1f / (numValleyPoints - 1));
 
 		// Initialise the valley points.
-		for (int i = 0; i < VALLEY_POINTS; i++) {
-			valleyWidths[i] = Math.max(1,
-					VALLEY_SIZE_MEAN + Globals.randomGaussian()
-							* VALLEY_SIZE_SD);
-			slopeAngle[i] = SLOPE_MEAN + Globals.randomGaussian() * SLOPE_SD;
-			slopeAngle[i * 2 + 1] = SLOPE_MEAN + Globals.randomGaussian()
-					* SLOPE_SD;
-			slopeCurves[i] = 1 + Math.abs(Globals.randomGaussian())
-					* SLOPE_CURVE_EXP_SD;
-			slopeCurves[i * 2 + 1] = 1 + Math.abs(Globals.randomGaussian())
-					* SLOPE_CURVE_EXP_SD;
-			
+		for (int i = 0; i < numValleyPoints; i++) {
+			valleyWidths[i] = (float) Math.max(0,
+					(VALLEY_SIZE_MEAN + Globals.randomGaussian()
+							* VALLEY_SIZE_SD)
+							* (sizeX + sizeZ) / 2f);
+			slopeAngle[i * 2] = (float) (SLOPE_MEAN + Globals.randomGaussian()
+					* SLOPE_SD);
+			slopeAngle[i * 2 + 1] = (float) (SLOPE_MEAN + Globals
+					.randomGaussian() * SLOPE_SD);
+			slopeCurves[i * 2] = (float) (1 + Globals.randomGaussian()
+					* SLOPE_CURVE_EXP_SD);
+			slopeCurves[i * 2 + 1] = (float) (1 + Globals.randomGaussian()
+					* SLOPE_CURVE_EXP_SD);
+
 			// Curving valley
-			valleyPoints[i] = new Vector2f(pointLength);
-			valleyPoints[i].rotateAroundOrigin(valleyDirection[i], true);
-			valleyPoints[i].subtractLocal(pointLength);
 			if (i == 0) {
-				valleyDirection[i] = (float) (Math.PI * 2 * Globals.random_
+				valleyDirection[i] = (float) (FastMath.TWO_PI * Globals.random_
 						.nextDouble());
+				valleyPoints[i] = new Vector2f(sizeX / 2, sizeZ / 2);
+				valleyPoints[i].rotateAroundOrigin(valleyDirection[i], true);
+				valleyPoints[i].addLocal(sizeX / 2, sizeZ / 2);
+				valleyDirection[i] += FastMath.PI;
 			} else {
-				valleyDirection[i] = (float) (valleyDirection[i - 1] + (Globals.random_
-						.nextDouble() - .5) * VALLEY_CURVE_MAX * 2);
+				valleyDirection[i] = (float) (valleyDirection[i - 1] + Globals
+						.randomCoeff() * VALLEY_CURVE_MAX);
+				valleyPoints[i] = new Vector2f(pointLength);
+				valleyPoints[i].rotateAroundOrigin(valleyDirection[i], true);
 				valleyPoints[i].addLocal(valleyPoints[i - 1]);
 			}
 		}
 
 		// Create the valley/ridge
-		// int minValue = Integer.MAX_VALUE;
-		// for (int x = 0; x < sizeX; x++) {
-		// for (int z = 0; z < sizeZ; z++) {
-		// // First determine which points to integrate slope between
-		// int slopeOrigin = determineSlopeOrigin()
-		//
-		// float distFromOrigin = Globals.distance(slopeOrigin.x,
-		// slopeOrigin.y, x, z) - distBuffer;
-		// double curveAngle = slopeAngle
-		// * Math.pow(slopeCurve, distFromOrigin);
-		// int coeff = (decreasing) ? 1 : -1;
-		// terrain[x][z] = (int) (coeff * Math.tan(curveAngle)
-		// * (distFromOrigin) / TILE_RATIO);
-		//
-		// // Adjust the roll
-		// float distFromLine = Globals.pointLineDist2f(
-		// new Vector2f(x, z), slopeOrigin, slopeLine);
-		// terrain[x][z] += (int) (Math.tan(slopeRoll) * distFromLine);
-		//
-		// // Update the minValue
-		// minValue = Math.min(minValue, terrain[x][z]);
-		// }
-		// }
+		int minValue = 0;
+		for (int x = 0; x < sizeX; x++) {
+			for (int z = 0; z < sizeZ; z++) {
+				// First determine which points to integrate slope between
+				Vector2f thisPoint = new Vector2f(x, z);
+				int slopeOrigin = determineSlopeOrigin(thisPoint, valleyPoints);
+
+				// Determine how far along the valley this point is (for valley
+				// width)
+				Vector2f lineDirection = valleyPoints[slopeOrigin + 1]
+						.subtract(valleyPoints[slopeOrigin]);
+				Vector2f lineOrigin = valleyPoints[slopeOrigin];
+				float lineIntersect = Globals.pointLineIntersect(thisPoint,
+						lineOrigin, lineDirection);
+				float pointDist = Globals.pointLineDist2f(thisPoint,
+						lineOrigin, lineDirection, lineIntersect);
+
+				float interpolatedWidth = FastMath.interpolateLinear(
+						lineIntersect, valleyWidths[slopeOrigin],
+						valleyWidths[slopeOrigin + 1]);
+				// If point close enough to line, it has no height difference.
+				if (Math.abs(pointDist) > interpolatedWidth) {
+					int whichSlope = (pointDist < 0) ? slopeOrigin
+							: slopeOrigin + 1;
+					float slopeDist = Math.abs(pointDist) - interpolatedWidth;
+					float interpolatedSlope = FastMath.interpolateLinear(
+							lineIntersect, slopeAngle[whichSlope],
+							slopeAngle[whichSlope + 2]);
+					terrain[x][z] = (int) (valleyRidgeCoeff
+							* Math.tan(interpolatedSlope) * slopeDist / TILE_RATIO);
+
+					// Curve the slope
+					float interpolatedCurve = FastMath.interpolateLinear(
+							lineIntersect, slopeCurves[whichSlope],
+							slopeCurves[whichSlope + 2]);
+					terrain[x][z] += (int) (valleyRidgeCoeff
+							* Math.tan(interpolatedCurve) * slopeDist / TILE_RATIO);
+
+					// Update the minValue
+					minValue = Math.min(minValue, terrain[x][z]);
+				}
+			}
+		}
 
 		return 0;
+	}
+
+	/**
+	 * Determines the origin point for calculating the valley slope from a given
+	 * x and z coordinate.
+	 * 
+	 * @param thisPoint
+	 *            The current point.
+	 * @param valleyPoints
+	 *            The valley points. If only two, just returns the first.
+	 * @return The index of the origin point.
+	 */
+	private int determineSlopeOrigin(Vector2f thisPoint, Vector2f[] valleyPoints) {
+		// If the valley is only of size 2, return the first one.
+		if (valleyPoints.length == 2)
+			return 0;
+
+		// Run through each valley point, calculating the two adjacent points
+		// nearest to this location.
+		int closest = 0;
+		double closestDistance = Integer.MAX_VALUE;
+		for (int i = 0; i < valleyPoints.length - 1; i++) {
+			double thisDist = thisPoint.distance(valleyPoints[i])
+					+ thisPoint.distance(valleyPoints[i + 1]);
+			if (thisDist < closestDistance) {
+				closestDistance = thisDist;
+				closest = i;
+			}
+		}
+		return closest;
 	}
 
 	/**
@@ -343,7 +501,7 @@ public class TacticalMap {
 				// Adjust the roll
 				float distFromLine = Globals.pointLineDist2f(
 						new Vector2f(x, z), slopeOrigin, slopeLine);
-				terrain[x][z] += (int) (Math.tan(slopeRoll) * distFromLine);
+				terrain[x][z] += (int) (Math.tan(slopeRoll) * distFromLine / TILE_RATIO);
 
 				// Update the minValue
 				minValue = Math.min(minValue, terrain[x][z]);

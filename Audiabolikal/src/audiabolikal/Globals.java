@@ -65,14 +65,14 @@ public class Globals {
 	 * 
 	 * @param point
 	 *            The point.
-	 * @param lineOrigin
-	 * @param lineDir
-	 * @return
+	 * @param lineOrigin The origin of the line.
+	 * @param lineDir The direction of the line.
+	 * @return The distance along the line from the origin.
 	 */
 	public static float pointLineIntersect(Vector2f point, Vector2f lineOrigin,
 			Vector2f lineDir) {
 		if (lineDir.equals(Vector2f.ZERO))
-			throw new ArithmeticException("Line has no direction.");
+			return 0;
 
 		float u = ((point.x - lineOrigin.x) * (lineDir.x) + (point.y - lineOrigin.y)
 				* (lineDir.y))
@@ -105,5 +105,14 @@ public class Globals {
 	public static float randomGaussian() {
 		float gaussian = (float) random_.nextGaussian();
 		return FastMath.clamp(gaussian, -SD_CAP, SD_CAP);
+	}
+
+	/**
+	 * Returns a random number between -1 and 1 inclusive.
+	 * 
+	 * @return A random value between -1 and 1 inclusive.
+	 */
+	public static float randomCoeff() {
+		return (random_.nextFloat() - .5f) * 2;
 	}
 }

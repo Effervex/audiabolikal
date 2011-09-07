@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import audiabolikal.terrain.TacticalMap;
 import audiabolikal.terrain.TerrainGeography;
-import audiabolikal.terrain.feature.TerrainFeature;
 
 public class TacticalMapTest {
 	private TacticalMap sut_;
