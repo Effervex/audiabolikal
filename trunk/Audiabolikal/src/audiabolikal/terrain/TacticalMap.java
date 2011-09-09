@@ -17,8 +17,8 @@ import audiabolikal.terrain.feature.TerrainFeatureEnum;
  * @author Samuel J. Sarjant
  */
 public class TacticalMap {
-	private static final Vector2f[] DIRECTIONS = { new Vector2f(-1, 0), new Vector2f(1, 0),
-			new Vector2f(0, 1), new Vector2f(0, -1) };
+	private static final Vector2f[] DIRECTIONS = { new Vector2f(-1, 0),
+			new Vector2f(1, 0), new Vector2f(0, 1), new Vector2f(0, -1) };
 	private static final float BUMPINESS_SD = .4f;
 	/**
 	 * The number of times a new feature is attempted to be added before giving
@@ -31,22 +31,25 @@ public class TacticalMap {
 	private static final int MAP_SIZE_SD = 3;
 	private static final float ORIGIN_BUFFER = 250;
 	private static final double SLOPE_CURVE_EXP_SD = .005;
-	private static final double SLOPE_MEAN = Math.PI / 3;
+	private static final double SLOPE_MEAN = Math.PI / 4;
 	private static final double SLOPE_SD = Math.PI / 24;
 	private static final double SLOPE_ROLL_SD = Math.PI / 6;
 	private static final double VALLEY_SIZE_MEAN = .2;
 	private static final double VALLEY_SIZE_SD = .15;
 	private static final double VALLEY_CURVE_MAX = Math.PI / 6;
-	private static final double WATER_LEVEL_MEAN = -2;
-	private static final double WATER_LEVEL_SD = 2;
-	private static final double ISLAND_HEIGHT_MEAN = 7;
-	private static final double ISLAND_HEIGHT_SD = 1.5;
-	/** The ratio of tile size to tile height. */
-	public static final float TILE_RATIO = 3;
 	/** The points in the valley to generate new slopes for [1-4]. */
 	private static final int MAX_VALLEY_POINTS = 6;
-	private static final float MIN_ISLANDS = .15f;
-	private static final float MAX_ISLANDS = .25f;
+	private static final double WATER_LEVEL_MEAN = -2;
+	private static final double WATER_LEVEL_SD = 2;
+	private static final float ISLAND_HEIGHT_MEAN = 7;
+	private static final float ISLAND_HEIGHT_SD = 1f;
+	private static final float ISLAND_SLOPE_SD = .6f;
+	private static final float ISLAND_ORIGIN_BUFFER = 1.25f;
+	private static final float MIN_ISLANDS = .25f;
+	private static final float MAX_ISLANDS = .35f;
+	private static final float ISLAND_SPREAD = 2;
+	/** The ratio of tile size to tile height. */
+	public static final float TILE_RATIO = 3;
 
 	/** The features of the terrain. */
 	private TerrainFeature[] features_;
@@ -270,42 +273,93 @@ public class TacticalMap {
 	 * @return The minimum value of the terrain.
 	 */
 	private int generateIslands(int sizeX, int sizeZ, int[][] terrain) {
-		int numIslands = (int) ((sizeX + sizeZ) / 2 * MIN_ISLANDS + Globals.random_
+		float avDimension = (sizeX + sizeZ) / 2f;
+		int numIslands = (int) (avDimension * MIN_ISLANDS + Globals.random_
 				.nextFloat() * (MAX_ISLANDS - MIN_ISLANDS));
+		ArrayList<Vector2f> origins = new ArrayList<Vector2f>(numIslands);
+		// Spread the origins of the islands enough
+		double sumDistance = 0;
+		do {
+			sumDistance = 0;
+			for (int i = 0; i < numIslands; i++) {
+				Vector2f origin = new Vector2f(
+						Globals.random_
+								.nextInt((int) (sizeX * ISLAND_ORIGIN_BUFFER)),
+						Globals.random_
+								.nextInt((int) (sizeZ * ISLAND_ORIGIN_BUFFER)));
+				origins.add(origin);
+				if (i > 0)
+					sumDistance += origin.distance(origins.get(i - 1));
+			}
+			sumDistance += origins.get(0).distance(origins.get(numIslands - 1));
+		} while (sumDistance < avDimension * ISLAND_SPREAD || numIslands <= 1);
 
 		// Generate different island points, building them up like bumpiness is
 		// built by using a queue of points. Cease building if the landmass
 		// drops below a given point.
-		for (int i = 0; i < numIslands; i++) {
+		for (Vector2f origin : origins) {
+			float[][] heightMap = new float[terrain.length * 2][terrain[0].length * 2];
 			LinkedList<Vector2f> points = new LinkedList<Vector2f>();
-			Vector2f origin = new Vector2f(Globals.random_.nextInt(sizeX),
-					Globals.random_.nextInt(sizeZ));
 			points.add(origin);
+
 			// Continue to update terrain while height is above previous value.
+			boolean isOrigin = true;
 			while (!points.isEmpty()) {
 				Vector2f point = points.pop();
 				// Note neighbour values and add neighbours to the points.
 				float average = 0;
 				int numAdjacent = 0;
+				Collection<Vector2f> adjacents = new LinkedList<Vector2f>();
 				for (Vector2f dir : DIRECTIONS) {
 					Vector2f adjacent = point.add(dir);
-					if (adjacent.x >= 0 && adjacent.x < sizeX && adjacent.y >= 0
-							&& adjacent.y < sizeZ) {
-						if (bumpMap[(int) adjacent.x][(int) adjacent.y] == null) {
-							if (!points.contains(adjacent))
-								points.add(adjacent);
-						} else {
-							average += bumpMap[(int) adjacent.x][(int) adjacent.y];
+					if (adjacent.x >= 0
+							&& adjacent.x < sizeX * ISLAND_ORIGIN_BUFFER
+							&& adjacent.y >= 0
+							&& adjacent.y < sizeZ * ISLAND_ORIGIN_BUFFER) {
+						if (heightMap[(int) adjacent.x][(int) adjacent.y] > 0) {
+							average += heightMap[(int) adjacent.x][(int) adjacent.y];
 							numAdjacent++;
+						} else if (heightMap[(int) adjacent.x][(int) adjacent.y] == 0
+								&& !points.contains(adjacent)) {
+							adjacents.add(adjacent);
 						}
 					}
 				}
 
-				// Apply the bumpiness
-				if (numAdjacent > 0)
+				// Add points to explore
+				if (isOrigin || numAdjacent > 0)
+					points.addAll(adjacents);
+
+				// Create the downhill slope
+				if (numAdjacent > 0) {
 					average /= numAdjacent;
-				bumpMap[(int) point.x][(int) point.y] = average
-						+ Globals.randomCoeff() * bumpiness;
+					float slopeDrop = Math.abs(Globals.randomGaussian())
+							* ISLAND_SLOPE_SD;
+					heightMap[(int) point.x][(int) point.y] = average
+							- slopeDrop;
+					if (heightMap[(int) point.x][(int) point.y] <= 0)
+						heightMap[(int) point.x][(int) point.y] = Integer.MIN_VALUE;
+				}
+
+				if (isOrigin) {
+					heightMap[(int) point.x][(int) point.y] = ISLAND_HEIGHT_MEAN
+							+ Globals.randomGaussian() * ISLAND_HEIGHT_SD;
+				}
+				isOrigin = false;
+
+				// Apply height map to terrain (making the conversion between
+				// the larger map for the islands)
+				float buffer = (ISLAND_ORIGIN_BUFFER - 1) / 2;
+				if (point.x >= sizeX * buffer && point.x < sizeX * (1 + buffer)
+						&& point.y >= sizeZ * buffer
+						&& point.y < sizeZ * (1 + buffer)) {
+					int shiftX = (int) (point.x - sizeX * buffer);
+					int shiftY = (int) (point.y - sizeZ * buffer);
+					terrain[shiftX][shiftY] = Math
+							.max(terrain[shiftX][shiftY],
+									(int) Math
+											.round(heightMap[(int) point.x][(int) point.y]));
+				}
 			}
 		}
 		return 0;
