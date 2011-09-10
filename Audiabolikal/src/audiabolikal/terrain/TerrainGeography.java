@@ -6,6 +6,8 @@ package audiabolikal.terrain;
  * @author Sam Sarjant
  */
 public enum TerrainGeography {
+	// A canyon is basically a 3 part cliff.
+	CANYON,
 	// A cliff is essentially a large vertical drop between the two levels.
 	CLIFF,
 	// Islands are a number of high points dotted about an otherwise flat surface.

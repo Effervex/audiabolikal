@@ -23,6 +23,7 @@ import com.jme3.shader.Shader;
 public class MapViewer extends SimpleApplication implements ActionListener {
 	public static final float TILE_SIZE = 1.5f;
 	public static final float TILE_HEIGHT = TILE_SIZE / TacticalMap.TILE_RATIO;
+	private static final float CAM_SPEED = 8f;
 
 	/** The terrain being viewed. */
 	private TacticalMap terrain_;
@@ -57,9 +58,10 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 	}
 
 	private void setUpCam() {
-		cam.setLocation(new Vector3f(-5,5,-5));
-		cam.setDirection(new Vector3f(1,-1,1));
-		//cam.setAxes(Vector3f.UNIT_X, Vector3f.UNIT_Y, Vector3f.UNIT_Z);
+		
+		//cam.setDirection(new Vector3f(1, -1, 1));
+		cam.setLocation(new Vector3f(7, 12, -7));
+		cam.setAxes(new Vector3f(-1,0,-1), Vector3f.UNIT_Y, new Vector3f(-1,-1,1));
 	}
 
 	/**
@@ -83,9 +85,13 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 					// Apply the texture theme
 					Material mat1 = new Material(assetManager,
 							"Common/MatDefs/Misc/Unshaded.j3md");
-					float colour = 0.8f - (y - lowestPoint) * 0.035f;
-					mat1.setColor("Color", new ColorRGBA(colour,
-							colour, colour, 1f));
+					float colour = 0.8f - (y - lowestPoint) * 0.025f;
+					if ((x + z) % 2 == 0)
+						mat1.setColor("Color", new ColorRGBA(colour, colour * .5f,
+								colour * .5f, 1f));
+					else
+						mat1.setColor("Color", new ColorRGBA(colour * .5f, colour,
+								colour * .5f, 1f));
 					tile.setMaterial(mat1);
 					rootNode.attachChild(tile);
 				}
@@ -131,6 +137,26 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 			down = value;
 		}
 	}
+	
+	@Override
+	public void simpleUpdate(float tpf) {
+		Vector3f camDir = cam.getLocation().clone();
+		Vector3f camLeft = cam.getLeft().clone().multLocal(CAM_SPEED * tpf);
+		Vector3f camForward = cam.getDirection().clone().multLocal(CAM_SPEED * tpf);
+		if (left) {
+			camDir.addLocal(camLeft);
+		}
+		if (right) {
+			camDir.addLocal(camLeft.negate());
+		}
+		if (up) {
+			camDir.addLocal(camForward);
+		}
+		if (down) {
+			camDir.addLocal(camForward.negate());
+		}
+		cam.setLocation(camDir);
+	}
 
 	/**
 	 * Default main method.
@@ -140,7 +166,7 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 	 */
 	public static void main(String[] args) {
 		MapViewer viewer = new MapViewer(new TacticalMap(
-				TerrainGeography.SLOPE, 10, 10));
+				TerrainGeography.CLIFF, 13, 12));
 		viewer.start();
 	}
 }
