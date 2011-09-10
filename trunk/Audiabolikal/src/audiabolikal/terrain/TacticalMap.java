@@ -31,25 +31,28 @@ public class TacticalMap {
 	private static final int MAP_SIZE_SD = 3;
 	private static final float ORIGIN_BUFFER = 250;
 	private static final double SLOPE_CURVE_EXP_SD = .005;
-	private static final double SLOPE_MEAN = Math.PI / 4;
+	private static final double SLOPE_MEAN = Math.PI / 3.5;
 	private static final double SLOPE_SD = Math.PI / 24;
 	private static final double SLOPE_ROLL_SD = Math.PI / 6;
-	private static final double VALLEY_SIZE_MEAN = .2;
-	private static final double VALLEY_SIZE_SD = .15;
-	private static final double VALLEY_CURVE_MAX = Math.PI / 6;
+	private static final double VALLEY_SIZE_MEAN = 0;
+	private static final double VALLEY_SIZE_SD = .05;
+	private static final double VALLEY_CURVE_MAX = Math.PI / 12;
 	/** The points in the valley to generate new slopes for [1-4]. */
 	private static final int MAX_VALLEY_POINTS = 6;
 	private static final double WATER_LEVEL_MEAN = -2;
 	private static final double WATER_LEVEL_SD = 2;
 	private static final float ISLAND_HEIGHT_MEAN = 7;
 	private static final float ISLAND_HEIGHT_SD = 1f;
-	private static final float ISLAND_SLOPE_SD = .6f;
+	private static final float ISLAND_SLOPE_SD = .8f;
 	private static final float ISLAND_ORIGIN_BUFFER = 1.25f;
 	private static final float MIN_ISLANDS = .25f;
 	private static final float MAX_ISLANDS = .35f;
 	private static final float ISLAND_SPREAD = 2;
 	/** The ratio of tile size to tile height. */
 	public static final float TILE_RATIO = 3;
+	private static final double CLIFF_FACE_SD = Math.PI / 36;
+	private static final double CLIFF_FACE_VARIATION_SD = Math.PI / 72;
+	private static final float CLIFF_SPLIT_SD = .1f;
 
 	/** The features of the terrain. */
 	private TerrainFeature[] features_;
@@ -240,6 +243,10 @@ public class TacticalMap {
 			break;
 		case ISLANDS:
 			lowestPoint_ = generateIslands(sizeX, sizeZ, terrain);
+			break;
+		case CLIFF:
+			lowestPoint_ = generateCliff(sizeX, sizeZ, midMap, terrain);
+			break;
 		}
 
 		// Determine the bumpiness
@@ -262,6 +269,87 @@ public class TacticalMap {
 	}
 
 	/**
+	 * Generates a cliff running along the x axis. Cliffs are non-angled in
+	 * orientation. Each cliff is made up of 2 angled segments, joined at an
+	 * end. A cliff face may be angled (but not by much).
+	 * 
+	 * @param sizeX
+	 *            The level x size.
+	 * @param sizeZ
+	 *            The level y size.
+	 * @param midMap
+	 *            The middle of the map.
+	 * @param terrain
+	 *            The terrain to fill.
+	 * @return The minimum value of the terrain.
+	 */
+	private int generateCliff(int sizeX, int sizeZ, Vector2f midMap,
+			int[][] terrain) {
+		double cliffFaceAngle = Math.PI / 2
+				- Math.abs(Globals.randomGaussian() * CLIFF_FACE_SD);
+		System.out.println(FastMath.RAD_TO_DEG * cliffFaceAngle);
+		double[] slopeAngles = {
+				SLOPE_MEAN + Globals.randomGaussian() * SLOPE_SD,
+				SLOPE_MEAN + Globals.randomGaussian() * SLOPE_SD };
+		double[] slopeCurves = {
+				1 + Globals.randomGaussian() * SLOPE_CURVE_EXP_SD,
+				1 + Globals.randomGaussian() * SLOPE_CURVE_EXP_SD };
+		int joinPoint = (Globals.random_.nextBoolean()) ? 0 : sizeZ;
+		int cliffSplitPoint = Math.round(sizeX / 2 + Globals.randomGaussian()
+				* CLIFF_SPLIT_SD * sizeX);
+		Vector2f cliffLineOrigin = new Vector2f(cliffSplitPoint, joinPoint);
+		Vector2f cliffLineDir = new Vector2f(0, sizeZ);
+		Vector2f slopeLineDir = new Vector2f(sizeX, 0);
+
+		// Run through each cell
+		int minValue = 0;
+		for (int x = 0; x < sizeX; x++) {
+			for (int z = 0; z < sizeZ; z++) {
+				Vector2f thisPoint = new Vector2f(x, z);
+
+				// Two slopes
+				double slopeAngle = 0;
+				double slopeCurve = 0;
+				boolean decreasing;
+				if (x < cliffSplitPoint) {
+					slopeAngle = slopeAngles[0];
+					slopeCurve = slopeCurves[0];
+					decreasing = true;
+				} else {
+					slopeAngle = slopeAngles[1];
+					slopeCurve = slopeCurves[1];
+					decreasing = false;
+				}
+
+				float slopeDist = Math.abs(Globals.pointLineDist2f(thisPoint,
+						cliffLineOrigin, slopeLineDir));
+				double curveAngle = slopeAngle
+						* Math.pow(slopeCurve, slopeDist);
+				int coeff = (decreasing) ? -1 : 1;
+				terrain[x][z] = (int) (coeff * Math.tan(curveAngle)
+						* (slopeDist) / TILE_RATIO);
+
+				// Update the minValue
+				minValue = Math.min(minValue, terrain[x][z]);
+
+				// Modify height from cliff face angle (if angle is less than 90
+				// degrees
+				if (cliffFaceAngle < Math.PI / 2) {
+					float cliffDist = Globals.pointLineDist2f(thisPoint.addLocal(new Vector2f(.5f, 0f)),
+							cliffLineOrigin, cliffLineDir);
+					int height = (int) Math.round(Math.tan(cliffFaceAngle + CLIFF_FACE_VARIATION_SD * Globals.randomGaussian())
+							* cliffDist);
+					// If the cliff face is less than the terrain either side.
+					if (Math.abs(height) < Math.abs(terrain[x][z])) {
+						terrain[x][z] = height;
+					}
+				}
+			}
+		}
+		return minValue;
+	}
+
+	/**
 	 * Generates a cluster of islands of variable height, shape and location
 	 * 
 	 * @param sizeX
@@ -281,6 +369,7 @@ public class TacticalMap {
 		double sumDistance = 0;
 		do {
 			sumDistance = 0;
+			origins.clear();
 			for (int i = 0; i < numIslands; i++) {
 				Vector2f origin = new Vector2f(
 						Globals.random_
