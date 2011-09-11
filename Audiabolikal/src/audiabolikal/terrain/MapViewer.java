@@ -56,8 +56,6 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 	}
 
 	private void setUpCam() {
-
-		// cam.setDirection(new Vector3f(1, -1, 1));
 		cam.setLocation(new Vector3f(7, 12, -7));
 		cam.setAxes(new Vector3f(-1, 0, -1), Vector3f.UNIT_Y, new Vector3f(-1,
 				-1, 1));
@@ -80,14 +78,8 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 						+ "]", box);
 				// Apply the texture theme
 				Material mat1 = new Material(assetManager,
-						"Common/MatDefs/Misc/Unshaded.j3md");
-				float colour = 0.8f - (y - lowestPoint) * 0.025f;
-				if ((x + z) % 2 == 0)
-					mat1.setColor("Color", new ColorRGBA(colour, colour * .5f,
-							colour * .5f, 1f));
-				else
-					mat1.setColor("Color", new ColorRGBA(colour * .5f, colour,
-							colour * .5f, 1f));
+						"Common/MatDefs/Light/Lighting.j3md");
+				mat1.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Terrain/Default/default.png"));
 				tile.setMaterial(mat1);
 				rootNode.attachChild(tile);
 			}
@@ -180,7 +172,7 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 	 */
 	public static void main(String[] args) {
 		MapViewer viewer = new MapViewer(new TacticalMap(
-				TerrainGeography.VALLEY, 11, 10));
+				TerrainGeography.ISLANDS, 11, 10));
 		viewer.start();
 	}
 }
