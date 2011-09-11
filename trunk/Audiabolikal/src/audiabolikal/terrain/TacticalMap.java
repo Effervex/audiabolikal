@@ -39,7 +39,7 @@ public class TacticalMap {
 	private static final double VALLEY_CURVE_MAX = Math.PI / 8;
 	/** The points in the valley to generate new slopes for [1-4]. */
 	private static final int MAX_VALLEY_POINTS = 6;
-	private static final double WATER_LEVEL_MEAN = -2;
+	private static final double WATER_LEVEL_MEAN = 2;
 	private static final double WATER_LEVEL_SD = 2;
 	private static final float ISLAND_HEIGHT_MEAN = 7;
 	private static final float ISLAND_HEIGHT_SD = 1f;
