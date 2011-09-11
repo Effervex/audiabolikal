@@ -31,12 +31,12 @@ public class TacticalMap {
 	private static final int MAP_SIZE_SD = 3;
 	private static final float ORIGIN_BUFFER = 250;
 	private static final double SLOPE_CURVE_EXP_SD = .005;
-	private static final double SLOPE_MEAN = Math.PI / 3.5;
+	private static final double SLOPE_MEAN = Math.PI / 3;
 	private static final double SLOPE_SD = Math.PI / 24;
 	private static final double SLOPE_ROLL_SD = Math.PI / 6;
 	private static final double VALLEY_SIZE_MEAN = 0;
 	private static final double VALLEY_SIZE_SD = .05;
-	private static final double VALLEY_CURVE_MAX = Math.PI / 12;
+	private static final double VALLEY_CURVE_MAX = Math.PI / 8;
 	/** The points in the valley to generate new slopes for [1-4]. */
 	private static final int MAX_VALLEY_POINTS = 6;
 	private static final double WATER_LEVEL_MEAN = -2;
@@ -51,8 +51,9 @@ public class TacticalMap {
 	/** The ratio of tile size to tile height. */
 	public static final float TILE_RATIO = 3;
 	private static final double CLIFF_FACE_SD = Math.PI / 36;
-	private static final double CLIFF_FACE_VARIATION_SD = Math.PI / 72;
+	private static final double CLIFF_FACE_VARIATION_SD = Math.PI / 36;
 	private static final float CLIFF_SPLIT_SD = .1f;
+	private static final float CANYON_WIDTH = 0.333f;
 
 	/** The features of the terrain. */
 	private TerrainFeature[] features_;
@@ -67,6 +68,9 @@ public class TacticalMap {
 
 	/** The rendered theme of the level. */
 	private TerrainTheme theme_;
+
+	/** The height of the water on this level. */
+	private int waterHeight_;
 
 	/**
 	 * Generates a new tactical map with default theme using the given seed.
@@ -245,7 +249,10 @@ public class TacticalMap {
 			lowestPoint_ = generateIslands(sizeX, sizeZ, terrain);
 			break;
 		case CLIFF:
-			lowestPoint_ = generateCliff(sizeX, sizeZ, midMap, terrain);
+			lowestPoint_ = generateCliff(sizeX, sizeZ, terrain);
+			break;
+		case CANYON:
+			lowestPoint_ = generateCanyon(sizeX, sizeZ, terrain);
 			break;
 		}
 
@@ -254,18 +261,109 @@ public class TacticalMap {
 		lowestPoint_ = Math.min(lowestPoint_,
 				applyBumpiness(terrain, sizeX, sizeZ, bumpiness));
 		// Water level
-		int waterLevel = lowestPoint_
+		waterHeight_ = lowestPoint_
 				+ (int) (WATER_LEVEL_MEAN + Globals.randomGaussian()
 						* WATER_LEVEL_SD);
 
 		// Applies the texture types to the terrain (roads, different ground
 		// types, etc.)
-		applyTextureTypes(terrain, waterLevel);
+		applyTextureTypes(terrain, waterHeight_);
 
 		// Checks that the terrain is valid and all reachable.
 		checkTerrain(terrain, lowestPoint_);
 
 		return terrain;
+	}
+
+	/**
+	 * Generates a canyon. Basically a two-sided cliff.
+	 * 
+	 * @param sizeX
+	 *            The level x size.
+	 * @param sizeZ
+	 *            The level z size.
+	 * @param terrain
+	 *            The terrain to fill.
+	 * @return The minimum value of the terrain.
+	 */
+	private int generateCanyon(int sizeX, int sizeZ, int[][] terrain) {
+		double[] cliffFaceAngle = {
+				Math.PI / 2 
+						- Math.abs(Globals.randomGaussian() * CLIFF_FACE_SD),
+				Math.PI / 2 
+						- Math.abs(Globals.randomGaussian() * CLIFF_FACE_SD) };
+		double[] slopeAngles = {
+				SLOPE_MEAN + Globals.randomGaussian() * SLOPE_SD,
+				SLOPE_MEAN + Globals.randomGaussian() * SLOPE_SD };
+		double[] slopeCurves = {
+				1 + Globals.randomGaussian() * SLOPE_CURVE_EXP_SD,
+				1 + Globals.randomGaussian() * SLOPE_CURVE_EXP_SD };
+		int joinPoint = (Globals.random_.nextBoolean()) ? 0 : sizeZ;
+		int[] cliffSplitPoint = {
+				Math.round(sizeX * CANYON_WIDTH + Globals.randomGaussian()
+						* CLIFF_SPLIT_SD / 2 * sizeX),
+				Math.round(sizeX * (1 - CANYON_WIDTH) + Globals.randomGaussian()
+						* CLIFF_SPLIT_SD / 2 * sizeX) };
+		Vector2f[] cliffLineOrigin = {
+				new Vector2f(cliffSplitPoint[0], joinPoint),
+				new Vector2f(cliffSplitPoint[1], joinPoint) };
+		Vector2f cliffLineDir = new Vector2f(0, sizeZ);
+		Vector2f slopeLineDir = new Vector2f(sizeX, 0);
+
+		// Run through each cell
+		int minValue = 0;
+		for (int x = 0; x < sizeX; x++) {
+			for (int z = 0; z < sizeZ; z++) {
+				Vector2f thisPoint = new Vector2f(x, z);
+
+				// Two slopes (decreasing in the middle)
+				double slopeAngle = 0;
+				double slopeCurve = 0;
+				boolean decreasing;
+				if (x >= cliffSplitPoint[0] && x < cliffSplitPoint[1]) {
+					slopeAngle = slopeAngles[0];
+					slopeCurve = slopeCurves[0];
+					decreasing = true;
+				} else {
+					slopeAngle = slopeAngles[1];
+					slopeCurve = slopeCurves[1];
+					decreasing = false;
+				}
+
+				float slopeDist = Math.abs(Globals.pointLineDist2f(thisPoint,
+						cliffLineOrigin[0], slopeLineDir));
+				double curveAngle = slopeAngle
+						* Math.pow(slopeCurve, slopeDist);
+				int coeff = (decreasing) ? -1 : 1;
+				terrain[x][z] = (int) (coeff * Math.tan(curveAngle)
+						* (slopeDist) / TILE_RATIO);
+
+				// Update the minValue
+				minValue = Math.min(minValue, terrain[x][z]);
+
+				// Modify height from cliff face angle (if angle is less than 90
+				// degrees
+				for (int i = 0; i < 2; i++) {
+					if (cliffFaceAngle[i] < Math.PI / 2) {
+						float cliffDist = Globals.pointLineDist2f(
+								thisPoint.addLocal(new Vector2f(.5f, 0f)),
+								cliffLineOrigin[i], cliffLineDir);
+						if (i == 0)
+							cliffDist *= -1;
+						int height = (int) Math.round(Math.tan(cliffFaceAngle[i]
+								+ CLIFF_FACE_VARIATION_SD
+								* Globals.randomGaussian())
+								* cliffDist);
+						// If the cliff face is less than the terrain either
+						// side.
+						if (Math.abs(height) < Math.abs(terrain[x][z])) {
+							terrain[x][z] = height;
+						}
+					}
+				}
+			}
+		}
+		return minValue;
 	}
 
 	/**
@@ -277,17 +375,13 @@ public class TacticalMap {
 	 *            The level x size.
 	 * @param sizeZ
 	 *            The level y size.
-	 * @param midMap
-	 *            The middle of the map.
 	 * @param terrain
 	 *            The terrain to fill.
 	 * @return The minimum value of the terrain.
 	 */
-	private int generateCliff(int sizeX, int sizeZ, Vector2f midMap,
-			int[][] terrain) {
+	private int generateCliff(int sizeX, int sizeZ, int[][] terrain) {
 		double cliffFaceAngle = Math.PI / 2
 				- Math.abs(Globals.randomGaussian() * CLIFF_FACE_SD);
-		System.out.println(FastMath.RAD_TO_DEG * cliffFaceAngle);
 		double[] slopeAngles = {
 				SLOPE_MEAN + Globals.randomGaussian() * SLOPE_SD,
 				SLOPE_MEAN + Globals.randomGaussian() * SLOPE_SD };
@@ -295,7 +389,7 @@ public class TacticalMap {
 				1 + Globals.randomGaussian() * SLOPE_CURVE_EXP_SD,
 				1 + Globals.randomGaussian() * SLOPE_CURVE_EXP_SD };
 		int joinPoint = (Globals.random_.nextBoolean()) ? 0 : sizeZ;
-		int cliffSplitPoint = Math.round(sizeX / 2 + Globals.randomGaussian()
+		int cliffSplitPoint = Math.round(sizeX / 2f + Globals.randomGaussian()
 				* CLIFF_SPLIT_SD * sizeX);
 		Vector2f cliffLineOrigin = new Vector2f(cliffSplitPoint, joinPoint);
 		Vector2f cliffLineDir = new Vector2f(0, sizeZ);
@@ -335,9 +429,12 @@ public class TacticalMap {
 				// Modify height from cliff face angle (if angle is less than 90
 				// degrees
 				if (cliffFaceAngle < Math.PI / 2) {
-					float cliffDist = Globals.pointLineDist2f(thisPoint.addLocal(new Vector2f(.5f, 0f)),
+					float cliffDist = Globals.pointLineDist2f(
+							thisPoint.addLocal(new Vector2f(.5f, 0f)),
 							cliffLineOrigin, cliffLineDir);
-					int height = (int) Math.round(Math.tan(cliffFaceAngle + CLIFF_FACE_VARIATION_SD * Globals.randomGaussian())
+					int height = (int) Math.round(Math.tan(cliffFaceAngle
+							+ CLIFF_FACE_VARIATION_SD
+							* Globals.randomGaussian())
 							* cliffDist);
 					// If the cliff face is less than the terrain either side.
 					if (Math.abs(height) < Math.abs(terrain[x][z])) {
@@ -681,5 +778,9 @@ public class TacticalMap {
 
 	public int getLowestPoint() {
 		return lowestPoint_;
+	}
+
+	public int getWaterHeight() {
+		return waterHeight_;
 	}
 }
