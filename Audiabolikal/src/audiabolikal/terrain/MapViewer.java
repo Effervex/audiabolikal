@@ -7,6 +7,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -55,16 +56,15 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 	}
 
 	private void setUpCam() {
-		
-		//cam.setDirection(new Vector3f(1, -1, 1));
+
+		// cam.setDirection(new Vector3f(1, -1, 1));
 		cam.setLocation(new Vector3f(7, 12, -7));
-		cam.setAxes(new Vector3f(-1,0,-1), Vector3f.UNIT_Y, new Vector3f(-1,-1,1));
+		cam.setAxes(new Vector3f(-1, 0, -1), Vector3f.UNIT_Y, new Vector3f(-1,
+				-1, 1));
 	}
 
 	/**
 	 * Sets up the base terrain.
-	 * 
-	 * TODO Just does this simply by drawing cubes for every tile from array
 	 */
 	private void setUpBaseTerrain() {
 		int[][] baseTerrain = terrain_.getTerrain();
@@ -72,28 +72,44 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 		for (int x = 0; x < baseTerrain.length; x++) {
 			for (int z = 0; z < baseTerrain[x].length; z++) {
 				// Draw cubes
-				for (int y = lowestPoint; y <= baseTerrain[x][z]; y++) {
-					Box box = new Box(
-							new Vector3f(x * TILE_SIZE, (y - TILE_HEIGHT / 2)
-									* TILE_HEIGHT, z * TILE_SIZE),
-							TILE_SIZE / 2, TILE_HEIGHT / 2, TILE_SIZE / 2);
-					Geometry tile = new Geometry("Tile[" + x + "," + y + ","
-							+ z + "]", box);
-					// Apply the texture theme
-					Material mat1 = new Material(assetManager,
-							"Common/MatDefs/Misc/Unshaded.j3md");
-					float colour = 0.8f - (y - lowestPoint) * 0.025f;
-					if ((x + z) % 2 == 0)
-						mat1.setColor("Color", new ColorRGBA(colour, colour * .5f,
-								colour * .5f, 1f));
-					else
-						mat1.setColor("Color", new ColorRGBA(colour * .5f, colour,
-								colour * .5f, 1f));
-					tile.setMaterial(mat1);
-					rootNode.attachChild(tile);
-				}
+				int y = baseTerrain[x][z];
+				float yVal = (y - lowestPoint + 1) / 2f * TILE_HEIGHT;
+				Box box = new Box(new Vector3f(x * TILE_SIZE, yVal, z
+						* TILE_SIZE), TILE_SIZE / 2, yVal, TILE_SIZE / 2);
+				Geometry tile = new Geometry("Tile[" + x + "," + y + "," + z
+						+ "]", box);
+				// Apply the texture theme
+				Material mat1 = new Material(assetManager,
+						"Common/MatDefs/Misc/Unshaded.j3md");
+				float colour = 0.8f - (y - lowestPoint) * 0.025f;
+				if ((x + z) % 2 == 0)
+					mat1.setColor("Color", new ColorRGBA(colour, colour * .5f,
+							colour * .5f, 1f));
+				else
+					mat1.setColor("Color", new ColorRGBA(colour * .5f, colour,
+							colour * .5f, 1f));
+				tile.setMaterial(mat1);
+				rootNode.attachChild(tile);
 			}
 		}
+
+		// Water
+//		int waterHeight = terrain_.getWaterHeight();
+//		if (waterHeight > lowestPoint) {
+//			float zBuff = 0.001f;
+//			Box waterBox = new Box(new Vector3f(zBuff, lowestPoint + zBuff,
+//					zBuff), new Vector3f((baseTerrain.length - zBuff * 2) * TILE_SIZE,
+//					(waterHeight + 1 - lowestPoint - zBuff * 2) * TILE_HEIGHT,
+//					(baseTerrain[0].length - zBuff * 2) * TILE_SIZE));
+//			Geometry water = new Geometry("Water", waterBox);
+//			water.setLocalTranslation(new Vector3f(-TILE_SIZE / 2f, 0, -TILE_SIZE / 2f));
+//			Material matWater = new Material(assetManager,
+//					"Common/MatDefs/Misc/Unshaded.j3md");
+//			matWater.setColor("Color", new ColorRGBA(0, 0, .5f, .5f));
+//			matWater.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+//			water.setMaterial(matWater);
+//			rootNode.attachChild(water);
+//		}
 	}
 
 	/**
@@ -134,12 +150,13 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 			down = value;
 		}
 	}
-	
+
 	@Override
 	public void simpleUpdate(float tpf) {
 		Vector3f camDir = cam.getLocation().clone();
 		Vector3f camLeft = cam.getLeft().clone().multLocal(CAM_SPEED * tpf);
-		Vector3f camForward = cam.getDirection().clone().multLocal(CAM_SPEED * tpf);
+		Vector3f camForward = cam.getDirection().clone()
+				.multLocal(CAM_SPEED * tpf);
 		if (left) {
 			camDir.addLocal(camLeft);
 		}
@@ -163,7 +180,7 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 	 */
 	public static void main(String[] args) {
 		MapViewer viewer = new MapViewer(new TacticalMap(
-				TerrainGeography.CLIFF, 13, 12));
+				TerrainGeography.VALLEY, 11, 10));
 		viewer.start();
 	}
 }
