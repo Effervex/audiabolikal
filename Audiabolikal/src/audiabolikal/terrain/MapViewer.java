@@ -19,8 +19,6 @@ import com.jme3.scene.shape.Box;
  * @author Sam Sarjant
  */
 public class MapViewer extends SimpleApplication implements ActionListener {
-	public static final float TILE_SIZE = 1.5f;
-	public static final float TILE_HEIGHT = TILE_SIZE / TacticalMap.TILE_RATIO;
 	private static final float CAM_SPEED = 8f;
 
 	/** The terrain being viewed. */
@@ -71,37 +69,46 @@ public class MapViewer extends SimpleApplication implements ActionListener {
 			for (int z = 0; z < baseTerrain[x].length; z++) {
 				// Draw cubes
 				int y = baseTerrain[x][z];
-				float yVal = (y - lowestPoint + 1) / 2f * TILE_HEIGHT;
-				Box box = new Box(new Vector3f(x * TILE_SIZE, yVal, z
-						* TILE_SIZE), TILE_SIZE / 2, yVal, TILE_SIZE / 2);
+				float yVal = (y - lowestPoint + 1) / 2f
+						* TacticalMap.TILE_HEIGHT;
+				Box box = new Box(new Vector3f(x * TacticalMap.TILE_WIDTH,
+						yVal, z * TacticalMap.TILE_WIDTH),
+						TacticalMap.TILE_WIDTH / 2, yVal,
+						TacticalMap.TILE_WIDTH / 2);
 				Geometry tile = new Geometry("Tile[" + x + "," + y + "," + z
 						+ "]", box);
 				// Apply the texture theme
 				Material mat1 = new Material(assetManager,
 						"Common/MatDefs/Light/Lighting.j3md");
-				mat1.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Terrain/Default/default.png"));
+				mat1.setTexture("DiffuseMap", assetManager
+						.loadTexture("Textures/Terrain/Default/default.png"));
 				tile.setMaterial(mat1);
 				rootNode.attachChild(tile);
 			}
 		}
 
 		// Water
-//		int waterHeight = terrain_.getWaterHeight();
-//		if (waterHeight > lowestPoint) {
-//			float zBuff = 0.001f;
-//			Box waterBox = new Box(new Vector3f(zBuff, lowestPoint + zBuff,
-//					zBuff), new Vector3f((baseTerrain.length - zBuff * 2) * TILE_SIZE,
-//					(waterHeight + 1 - lowestPoint - zBuff * 2) * TILE_HEIGHT,
-//					(baseTerrain[0].length - zBuff * 2) * TILE_SIZE));
-//			Geometry water = new Geometry("Water", waterBox);
-//			water.setLocalTranslation(new Vector3f(-TILE_SIZE / 2f, 0, -TILE_SIZE / 2f));
-//			Material matWater = new Material(assetManager,
-//					"Common/MatDefs/Misc/Unshaded.j3md");
-//			matWater.setColor("Color", new ColorRGBA(0, 0, .5f, .5f));
-//			matWater.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-//			water.setMaterial(matWater);
-//			rootNode.attachChild(water);
-//		}
+		int waterHeight = terrain_.getWaterHeight();
+		if (waterHeight > lowestPoint) {
+			float zBuff = 0.001f;
+			Box waterBox = new Box(new Vector3f(zBuff, lowestPoint + zBuff,
+					zBuff), new Vector3f((baseTerrain.length - zBuff * 2)
+					* TacticalMap.TILE_WIDTH,
+					(waterHeight + 1 - lowestPoint - zBuff * 2)
+							* TacticalMap.TILE_HEIGHT,
+					(baseTerrain[0].length - zBuff * 2)
+							* TacticalMap.TILE_WIDTH));
+			Geometry water = new Geometry("Water", waterBox);
+			water.setLocalTranslation(new Vector3f(
+					-TacticalMap.TILE_WIDTH / 2f, 0,
+					-TacticalMap.TILE_WIDTH / 2f));
+			Material matWater = new Material(assetManager,
+					"Common/MatDefs/Misc/Unshaded.j3md");
+			matWater.setColor("Color", new ColorRGBA(0, 0, .5f, .5f));
+			matWater.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+			water.setMaterial(matWater);
+			rootNode.attachChild(water);
+		}
 	}
 
 	/**
