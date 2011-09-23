@@ -32,6 +32,7 @@ public class Building extends TerrainFeature {
 	private final int MAX_FRONT_GAP = 8;
 
 	public Building() {
+		super();
 		int sizeX = (int) Math.round(Math.max(MIN_DIMENSION, SIZE_MEAN
 				+ Globals.random_.nextGaussian() * SIZE_SD));
 		int sizeY = (int) (ONE_STOREY_TILES * Math.round(1
@@ -70,7 +71,7 @@ public class Building extends TerrainFeature {
 							- (1 - size_.z));
 
 			Vector3f location = groundFeature(location2d, tacticalMap);
-			boolean result = checkValidLocation(tacticalMap, features, location);
+			boolean result = setValidLocation(tacticalMap, features, location);
 			if (result)
 				return true;
 		}
@@ -128,7 +129,8 @@ public class Building extends TerrainFeature {
 						existing.getLocation().z);
 
 				Vector3f location = groundFeature(location2d, tacticalMap);
-				checkValidLocation(tacticalMap, features, location);
+				if (setValidLocation(tacticalMap, features, location))
+					return true;
 			}
 		}
 		return false;
