@@ -3,7 +3,9 @@ package audiabolikal.terrain.feature;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import audiabolikal.Globals;
 import audiabolikal.terrain.TacticalMap;
@@ -13,7 +15,9 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 
 /**
- * A terrain feature which can be added to the tactical map.
+ * A terrain feature which can be added to the tactical map. This feature will
+ * always be grounded at y = 0 at at least one point and every structural value
+ * will be positive.
  * 
  * @author Sam Sarjant
  */
@@ -38,18 +42,17 @@ public abstract class TerrainFeature {
 	private Integer[][] base_;
 	/** The highest point of the feature. */
 	private int highestPoint_;
-	/** The lowest point of the feature. */
-	private int lowestPoint_;
 
 	public TerrainFeature() {
 		location_ = new Vector3f(0, 0, 0);
-		// TODO Extract the other measurements from the structure
+		// Extract the other measurements from the structure
 		updateStructureMeasurements(initialiseStructure());
 	}
 
 	/**
-	 * Initialise the structure of the feature. TODO Probably need to change
-	 * this to also include texture types.
+	 * Initialise the structure of the feature. Note that the structure should
+	 * not include and negative values. TODO Probably need to change this to
+	 * also include texture types.
 	 * 
 	 * @return The structure of the feature.
 	 */
@@ -64,9 +67,47 @@ public abstract class TerrainFeature {
 	 */
 	protected final void updateStructureMeasurements(
 			Collection<Vector3f> structure) {
+		// If same structure, don't update anything.
+		if (structure_ != null && structure_.equals(structure))
+			return;
+		
 		structure_ = structure;
-		// TODO Auto-generated method stub
-		// Set size, surface, base, lowest point, highest point
+		
+		// Run through the structure points, noting extra information throughout the loop.
+		Vector3f maxVals = new Vector3f(-(Float.MAX_VALUE - 1), -(Float.MAX_VALUE - 1), -(Float.MAX_VALUE - 1));
+		Map<Vector2f, Integer[]> verticalMap = new HashMap<Vector2f, Integer[]>();
+		for (Vector3f point : structure_) {
+			// Check min and max val measurements
+			maxVals.x = Math.max(maxVals.x, point.x);
+			maxVals.y = Math.max(maxVals.y, point.y);
+			maxVals.z = Math.max(maxVals.z, point.z);
+			
+			// Determine the upper and lower areas of the object
+			Vector2f thisLoc = new Vector2f(point.x, point.z);
+			if (!verticalMap.containsKey(thisLoc)) {
+				Integer[] thisHeight = { (int) point.y, (int) point.y };
+				verticalMap.put(thisLoc, thisHeight);
+			} else {
+				Integer[] thisHeight = verticalMap.get(thisLoc);
+				if (point.y > thisHeight[0])
+					thisHeight[0] = (int) point.y;
+				if (point.y < thisHeight[1])
+					thisHeight[1] = (int) point.y;
+			}
+		}
+		
+		// Find the size from the min and max vals.
+		size_ = maxVals.add(1,1,1);
+		highestPoint_ = (int) maxVals.y;
+		
+		// Transform the maps into arrays
+		surface_ = new Integer[(int) size_.x][(int) size_.z];
+		base_ = new Integer[(int) size_.x][(int) size_.z];
+		for (Vector2f pos : verticalMap.keySet()) {
+			Integer[] heights = verticalMap.get(pos);
+			surface_[(int) pos.x][(int) pos.y] = heights[0];
+			base_[(int) pos.x][(int) pos.y] = heights[1];
+		}
 	}
 
 	/**
@@ -144,7 +185,7 @@ public abstract class TerrainFeature {
 			for (int z = 0; z < base_[0].length; z++) {
 				Integer baseVal = base_[x][z];
 				// If this current point is lowest
-				if (baseVal != null && baseVal == lowestPoint_) {
+				if (baseVal != null && baseVal == 0) {
 					int xLoc = x + (int) location_.x;
 					int zLoc = z + (int) location_.z;
 					if (withinMap(x, z, terrain)) {
